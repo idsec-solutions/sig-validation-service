@@ -1,48 +1,14 @@
 package se.idsec.sigval.sigvalservice.configuration;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgorithmRegistry;
-import se.idsec.sigval.cert.chain.impl.StatusCheckingCertificateValidatorImpl;
 import se.idsec.sigval.cert.validity.crl.CRLCache;
 import se.idsec.sigval.cert.validity.crl.impl.CRLCacheImpl;
-import se.idsec.sigval.commons.algorithms.DigestAlgorithm;
-import se.idsec.sigval.commons.algorithms.DigestAlgorithmRegistry;
-import se.idsec.sigval.commons.algorithms.JWSAlgorithmRegistry;
-import se.idsec.sigval.commons.algorithms.PublicKeyType;
-import se.idsec.sigval.commons.data.PubKeyParams;
-import se.idsec.sigval.commons.timestamp.TimeStampPolicyVerifier;
-import se.idsec.sigval.commons.timestamp.impl.BasicTimstampPolicyVerifier;
-import se.idsec.sigval.commons.utils.GeneralCMSUtils;
-import se.idsec.sigval.commons.utils.SVAUtils;
-import se.idsec.sigval.pdf.pdfstruct.impl.DefaultPDFSignatureContextFactory;
-import se.idsec.sigval.pdf.svt.PDFSVTSigValClaimsIssuer;
-import se.idsec.sigval.pdf.svt.PDFSVTValidator;
-import se.idsec.sigval.pdf.utils.CMSVerifyUtils;
-import se.idsec.sigval.pdf.verify.ExtendedPDFSignatureValidator;
-import se.idsec.sigval.pdf.verify.PDFSingleSignatureValidator;
-import se.idsec.sigval.pdf.verify.impl.PDFSingleSignatureValidatorImpl;
-import se.idsec.sigval.pdf.verify.impl.SVTenabledPDFDocumentSigVerifier;
-import se.idsec.sigval.pdf.verify.policy.PDFSignaturePolicyValidator;
-import se.idsec.sigval.pdf.verify.policy.impl.PkixPdfSignaturePolicyValidator;
 import se.idsec.sigval.sigvalservice.configuration.keys.LocalKeySource;
-import se.idsec.sigval.svt.algorithms.SVTAlgoRegistry;
 import se.idsec.sigval.svt.issuer.SVTModel;
-import se.idsec.sigval.xml.policy.XMLSignaturePolicyValidator;
-import se.idsec.sigval.xml.policy.impl.PkixXmlSignaturePolicyValidator;
-import se.idsec.sigval.xml.svt.XMLDocumentSVTIssuer;
-import se.idsec.sigval.xml.svt.XMLSVTSigValClaimsIssuer;
-import se.idsec.sigval.xml.svt.XMLSVTValidator;
-import se.idsec.sigval.xml.verify.ExtendedXMLSignedDocumentValidator;
-import se.idsec.sigval.xml.verify.XMLSignatureElementValidator;
-import se.idsec.sigval.xml.verify.impl.XMLSignatureElementValidatorImpl;
-import se.idsec.sigval.xml.verify.impl.XMLSignedDocumentValidator;
 import se.swedenconnect.opensaml.pkcs11.PKCS11Provider;
 import se.swedenconnect.opensaml.pkcs11.PKCS11ProviderFactory;
 import se.swedenconnect.opensaml.pkcs11.configuration.PKCS11ProvidedCfgConfiguration;
@@ -51,8 +17,6 @@ import se.swedenconnect.opensaml.pkcs11.configuration.PKCS11SoftHsmProviderConfi
 import se.swedenconnect.opensaml.pkcs11.configuration.SoftHsmCredentialConfiguration;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.*;
@@ -83,110 +47,6 @@ public class BeanConfig {
     }
     return builder.build();
   }
-
-/*  @Bean
-  public PDFSVTSigValClaimsIssuer pdfsvtSigValClaimsIssuer(
-    @Autowired LocalKeySource svtKeySource,
-    @Autowired ExtendedPDFSignatureValidator pdfValidator,
-    @Autowired JWSAlgorithm jwsAlgorithm
-  ) throws NoSuchAlgorithmException, JOSEException {
-    return new PDFSVTSigValClaimsIssuer(
-      jwsAlgorithm,
-      svtKeySource.getCredential().getPrivateKey(),
-      Arrays.asList(svtKeySource.getCredential().getEntityCertificate()),
-      pdfValidator);
-  }
-
-  @Bean
-  public ExtendedPDFSignatureValidator extendedPDFSignatureValidator(
-    @Autowired CertificateValidators certificateValidators,
-    @Autowired TimeStampPolicyVerifier timeStampPolicyVerifier
-  ) {
-    PDFSignaturePolicyValidator signaturePolicyValidator = new PkixPdfSignaturePolicyValidator();
-    PDFSingleSignatureValidator pdfSignatureVerifier = new PDFSingleSignatureValidatorImpl(
-      certificateValidators.getSignatureCertificateValidator(), signaturePolicyValidator,
-      timeStampPolicyVerifier);
-
-    // Setup SVA validator
-    PDFSVTValidator pdfsvtValidator = new PDFSVTValidator(certificateValidators.getSvtCertificateValidator(), timeStampPolicyVerifier);
-
-    // Get the pdf validator
-    ExtendedPDFSignatureValidator pdfValidator = new SVTenabledPDFDocumentSigVerifier(pdfSignatureVerifier, pdfsvtValidator, new DefaultPDFSignatureContextFactory());
-    return pdfValidator;
-  }
-
-  @Bean
-  public XMLDocumentSVTIssuer xmlDocumentSVTIssuer(
-    @Autowired LocalKeySource svtKeySource,
-    @Autowired XMLSignatureElementValidator xmlSignatureElementValidator,
-    @Autowired JWSAlgorithm jwsAlgorithm
-  ) throws JOSEException, NoSuchAlgorithmException, IOException {
-
-    XMLSVTSigValClaimsIssuer claimsIssuer = new XMLSVTSigValClaimsIssuer(
-      jwsAlgorithm,
-      svtKeySource.getCredential().getPrivateKey(),
-      Arrays.asList(svtKeySource.getCredential().getEntityCertificate()),
-      xmlSignatureElementValidator
-    );
-    return new XMLDocumentSVTIssuer(claimsIssuer);
-  }
-
-  @Bean JWSAlgorithm svtAlgorithm(
-    @Autowired LocalKeySource svtKeySource,
-    @Value("${sigval-service.svt.model.hash-algo:#{null}}") String hashAlgo) throws IOException, NoSuchAlgorithmException {
-    DigestAlgorithm digestAlgorithm = StringUtils.isNotEmpty(hashAlgo)
-      ? DigestAlgorithmRegistry.get(DigestAlgorithm.ID_SHA512)
-      : DigestAlgorithmRegistry.get(hashAlgo);
-
-    Map<JWSAlgorithm, SVTAlgoRegistry.AlgoProperties> supportedAlgoMap = SVTAlgoRegistry.getSupportedAlgoMap();
-    Set<JWSAlgorithm> jwsAlgorithms = supportedAlgoMap.keySet();
-    PublicKeyType pkType = GeneralCMSUtils.getPkParams(svtKeySource.getCertificate().getPublicKey()).getPkType();
-    Optional<JWSAlgorithm> jwsAlgorithmOptional = jwsAlgorithms.stream()
-      .filter(jwsAlgorithm -> {
-        JWSAlgorithm.Family family = supportedAlgoMap.get(jwsAlgorithm).getType();
-        switch (pkType) {
-
-        case EC:
-          return family.equals(JWSAlgorithm.Family.EC) && jwsAlgorithm.getName().startsWith("E");
-        case RSA:
-          return family.equals(JWSAlgorithm.Family.RSA) && jwsAlgorithm.getName().startsWith("P");
-        case Unknown:
-          return false;
-        }
-        return false;
-      })
-      .filter(jwsAlgorithm -> supportedAlgoMap.get(jwsAlgorithm).getDigestAlgoId().equalsIgnoreCase(digestAlgorithm.getUri()))
-      .findFirst();
-    if (!jwsAlgorithmOptional.isPresent()){
-      log.error("Non supported SVT hash algorithm and SVT key combination");
-      throw new IOException("Non supported SVT hash algorithm and SVT key combination");
-    }
-    log.info("Setting JWS algorithm for SVT issuance to: {}", jwsAlgorithmOptional.get());
-    return jwsAlgorithmOptional.get();
-  }
-
-  @Bean
-  public ExtendedXMLSignedDocumentValidator getXMLValidator(@Autowired XMLSignatureElementValidator xmlSignatureElementValidator) {
-    return new XMLSignedDocumentValidator(xmlSignatureElementValidator);
-  }
-
-  @Bean
-  public XMLSignatureElementValidator xmlSignatureElementValidator(
-    @Autowired TimeStampPolicyVerifier timeStampPolicyVerifier,
-    @Autowired CertificateValidators certificateValidators
-  ){
-    XMLSignaturePolicyValidator xmlSignaturePolicyValidator = new PkixXmlSignaturePolicyValidator();
-
-    return new XMLSignatureElementValidatorImpl(
-      certificateValidators.getSignatureCertificateValidator(), xmlSignaturePolicyValidator, timeStampPolicyVerifier,
-      new XMLSVTValidator(certificateValidators.getSvtCertificateValidator())
-    );
-  }
-
-  @Bean
-  public TimeStampPolicyVerifier timeStampPolicyVerifier(@Autowired CertificateValidators validators) {
-    return new BasicTimstampPolicyVerifier(validators.getTimestampCertificateValidator());
-  }*/
 
   @Bean
   public CRLCache crlCache(
