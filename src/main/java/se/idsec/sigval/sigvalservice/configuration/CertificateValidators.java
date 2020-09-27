@@ -25,25 +25,29 @@ import java.util.List;
 public class CertificateValidators {
 
   private final CRLCache crlCache;
+  @Value("${sigval-service.cert-validator.sig.tsltrust-root:#{null}}") String sigTslTrustRoot;
+  @Value("${sigval-service.cert-validator.sig.trusted-folder:#{null}}") String sigTrustFolder;
+  @Value("${sigval-service.cert-validator.tsa.tsltrust-root:#{null}}") String tsaTslTrustRoot;
+  @Value("${sigval-service.cert-validator.tsa.trusted-folder:#{null}}") String tsaTrustFolder;
+  @Value("${sigval-service.cert-validator.svt.tsltrust-root:#{null}}") String svtTslTrustRoot;
+  @Value("${sigval-service.cert-validator.svt.trusted-folder:#{null}}") String svtTrustFolder;
+  @Value("${sigval-service.cert-validator.svt.kid-match-folder:#{null}}") String kidMatchFolder;
 
   @Getter private CertificateValidator signatureCertificateValidator;
   @Getter private CertificateValidator timestampCertificateValidator;
   @Getter private CertificateValidator svtCertificateValidator;
+  @Getter private List<X509Certificate> kidMatchCerts;
 
   @Autowired
-  public CertificateValidators(
-    CRLCache crlCache,
-    @Value("${sigval-service.cert-validator.sig.tsltrust-root:#{null}}") String sigTslTrustRoot,
-    @Value("${sigval-service.cert-validator.sig.trusted-folder:#{null}}") String sigTrustFolder,
-    @Value("${sigval-service.cert-validator.tsa.tsltrust-root:#{null}}") String tsaTslTrustRoot,
-    @Value("${sigval-service.cert-validator.tsa.trusted-folder:#{null}}") String tsaTrustFolder,
-    @Value("${sigval-service.cert-validator.svt.tsltrust-root:#{null}}") String svtTslTrustRoot,
-    @Value("${sigval-service.cert-validator.svt.trusted-folder:#{null}}") String svtTrustFolder
-  ) throws IOException, CertificateException {
+  public CertificateValidators(CRLCache crlCache) {
     this.crlCache = crlCache;
+  }
+
+  public void loadValidators() throws IOException, CertificateException {
     signatureCertificateValidator = getCertValidator(crlCache, sigTrustFolder, sigTslTrustRoot);
     timestampCertificateValidator = getCertValidator(crlCache, tsaTrustFolder, tsaTslTrustRoot);
     svtCertificateValidator = getCertValidator(crlCache, svtTrustFolder, svtTslTrustRoot);
+    kidMatchCerts = Arrays.asList(getAdditionalTrustedCerts(null, kidMatchFolder));
   }
 
   private CertificateValidator getCertValidator(CRLCache crlCache, String trustFolder, String tslTrustRoot)

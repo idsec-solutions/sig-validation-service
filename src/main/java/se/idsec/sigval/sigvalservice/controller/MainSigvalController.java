@@ -12,6 +12,7 @@ import se.idsec.sigval.commons.document.DocType;
 import se.idsec.sigval.pdf.data.ExtendedPdfSigValResult;
 import se.idsec.sigval.pdf.verify.ExtendedPDFSignatureValidator;
 import se.idsec.sigval.sigvalservice.configuration.FileSize;
+import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 import se.idsec.sigval.sigvalservice.configuration.UIText;
 import se.idsec.sigval.xml.data.ExtendedXmlSigvalResult;
 import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
@@ -28,17 +29,15 @@ public class MainSigvalController {
   private final UIText uiText;
   private final FileSize maxFileSize;
   private final HttpSession httpSession;
-  private final ExtendedPDFSignatureValidator pdfSignatureValidator;
-  private final ExtendedXMLSignedDocumentValidator xmlSignatureValidator;
+  private final SignatureValidatorProvider signatureValidatorProvider;
 
   @Autowired
   public MainSigvalController(UIText uiText, FileSize maxFileSize, HttpSession httpSession,
-    ExtendedPDFSignatureValidator pdfSignatureValidator, ExtendedXMLSignedDocumentValidator xmlSignatureValidator) {
+    SignatureValidatorProvider signatureValidatorProvider) {
     this.uiText = uiText;
     this.maxFileSize = maxFileSize;
     this.httpSession = httpSession;
-    this.pdfSignatureValidator = pdfSignatureValidator;
-    this.xmlSignatureValidator = xmlSignatureValidator;
+    this.signatureValidatorProvider = signatureValidatorProvider;
   }
 
   @RequestMapping("/")
@@ -87,14 +86,16 @@ public class MainSigvalController {
   }
 
   private void validatePdfDoc(byte[] signedDoc) throws SignatureException {
-    SignedDocumentValidationResult<ExtendedPdfSigValResult> validationResult = pdfSignatureValidator.extendedResultValidation(signedDoc);
+    ExtendedPDFSignatureValidator pdfValidator = signatureValidatorProvider.getPdfSignatureValidator();
+    SignedDocumentValidationResult<ExtendedPdfSigValResult> validationResult = pdfValidator.extendedResultValidation(signedDoc);
 
     int sdfs=0;
   }
 
   private void validateXmlDoc(byte[] signedDoc) throws ParserConfigurationException, SAXException, IOException, SignatureException {
+    ExtendedXMLSignedDocumentValidator xmlValidator = signatureValidatorProvider.getXmlSignedDocumentValidator();
     Document document = XMLDocumentBuilder.getDocument(signedDoc);
-    SignedDocumentValidationResult<ExtendedXmlSigvalResult> validationResult = xmlSignatureValidator.extendedResultValidation(
+    SignedDocumentValidationResult<ExtendedXmlSigvalResult> validationResult = xmlValidator.extendedResultValidation(
       document);
 
     int sdfs=0;

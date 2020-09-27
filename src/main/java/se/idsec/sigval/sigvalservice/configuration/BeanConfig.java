@@ -84,7 +84,7 @@ public class BeanConfig {
     return builder.build();
   }
 
-  @Bean
+/*  @Bean
   public PDFSVTSigValClaimsIssuer pdfsvtSigValClaimsIssuer(
     @Autowired LocalKeySource svtKeySource,
     @Autowired ExtendedPDFSignatureValidator pdfValidator,
@@ -186,7 +186,7 @@ public class BeanConfig {
   @Bean
   public TimeStampPolicyVerifier timeStampPolicyVerifier(@Autowired CertificateValidators validators) {
     return new BasicTimstampPolicyVerifier(validators.getTimestampCertificateValidator());
-  }
+  }*/
 
   @Bean
   public CRLCache crlCache(
