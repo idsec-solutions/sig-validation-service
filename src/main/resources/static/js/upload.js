@@ -11,7 +11,7 @@ $(document).ready(function () {
     }).on('filebatchpreupload', function (event, data, id, index) {
         $('#kv-success-2').html('<h4>Upload Status</h4><ul></ul>').hide();
     }).on('filebatchuploadsuccess', function (event, data) {
-        setTimeout(function(){window.location="result";},500);
+        setTimeout(function(){window.location="validate";},500);
     });
 
 });

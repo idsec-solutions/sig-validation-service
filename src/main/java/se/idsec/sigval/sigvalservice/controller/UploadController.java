@@ -3,7 +3,6 @@ package se.idsec.sigval.sigvalservice.controller;
 import lombok.extern.log4j.Log4j2;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -48,10 +47,10 @@ public class UploadController {
       uploadErrorMessage = ex.getMessage();
     }
 
-    httpSession.setAttribute("signedDoc", signedDoc);
-    httpSession.setAttribute("uploadErrorMessage", uploadErrorMessage);
-    httpSession.setAttribute("tbsType", file.getContentType());
-    httpSession.setAttribute("tbsName", file.getOriginalFilename());
+    httpSession.setAttribute(SessionAttr.signedDoc.name(), signedDoc);
+    httpSession.setAttribute(SessionAttr.uploadErrorMessage.name(), uploadErrorMessage);
+    httpSession.setAttribute(SessionAttr.docMimeType.name(), file.getContentType());
+    httpSession.setAttribute(SessionAttr.docName.name(), file.getOriginalFilename());
     return "[]";
   }
 
@@ -59,14 +58,14 @@ public class UploadController {
   public byte[] getInlinePdfDocument(@RequestParam(value = "target", required = false) String target) throws IOException {
     byte[] docBytes = null;
     if (target != null && target.equalsIgnoreCase("signed")) {
-      docBytes = (byte[]) httpSession.getAttribute("signedDoc");
+      docBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
     }
     else {
       docBytes = (byte[]) httpSession.getAttribute("tbsBytes");
     }
-    String tbsType = (String) httpSession.getAttribute("tbsType");
+    String docMimeType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
 
-    if (docBytes == null || !tbsType.equalsIgnoreCase("application/pdf")) {
+    if (docBytes == null || !docMimeType.equalsIgnoreCase("application/pdf")) {
       throw new IllegalArgumentException("Target PDF file is not available");
     }
     return docBytes;
@@ -75,9 +74,9 @@ public class UploadController {
   @RequestMapping(value = "/pdfdoc", method = RequestMethod.GET, produces = "application/pdf")
   public ResponseEntity<InputStreamResource> getPdfDocument() throws IOException {
 
-    byte[] signedDoc = (byte[]) httpSession.getAttribute("signedDoc");
-    String tbsType = (String) httpSession.getAttribute("tbsType");
-    String tbsName = (String) httpSession.getAttribute("tbsName");
+    byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    String tbsType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
+    String tbsName = (String) httpSession.getAttribute(SessionAttr.docName.name());
     tbsName = tbsName.replaceAll("\\s*,\\s*", "-");
 
     if (signedDoc == null || !tbsType.equalsIgnoreCase("application/pdf")) {
@@ -95,9 +94,9 @@ public class UploadController {
   @RequestMapping(value = "/xmldoc", method = RequestMethod.GET, produces = "text/xml")
   public ResponseEntity<InputStreamResource> getXmlDocument() throws IOException {
 
-    byte[] signedDoc = (byte[]) httpSession.getAttribute("signedDoc");
-    String tbsType = (String) httpSession.getAttribute("tbsType");
-    String tbsName = (String) httpSession.getAttribute("tbsName");
+    byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    String tbsType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
+    String tbsName = (String) httpSession.getAttribute(SessionAttr.docName.name());
     tbsName = tbsName.replaceAll("\\s*,\\s*", "-");
 
     if (signedDoc == null || !tbsType.equalsIgnoreCase("text/xml")) {

@@ -1,4 +1,4 @@
-package se.idsec.sigval.sigvalservice.configuration;
+package se.idsec.sigval.sigvalservice.configuration.ui;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +21,8 @@ public class UIText extends ResourceBundleMessageSource{
     );
   }
 
-  public ResourceBundle getBundle(UiBundle bundle, String lang){
-    return getResourceBundle(bundle.baseName, new Locale(lang));
+  public UTF8Bundle getBundle(UiBundle bundle, String lang){
+    return new UTF8Bundle(getResourceBundle(bundle.baseName, new Locale(lang)));
   }
 
   @AllArgsConstructor
@@ -37,4 +37,16 @@ public class UIText extends ResourceBundleMessageSource{
 
     String baseName;
   }
+
+  @AllArgsConstructor
+  public static class UTF8Bundle{
+
+    private final ResourceBundle bundle;
+
+    public String getString(String key){
+      return UIUtils.fromIso(bundle.getString(key));
+    }
+
+  }
+
 }

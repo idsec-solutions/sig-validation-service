@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="Signature Validation Service"/>
+    <meta name="author" content="IDsec Solutions AB"/>
+    <meta http-equiv='pragma' content='no-cache'/>
+    <meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate'/>
+    <meta http-equiv="Expires" content="-1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <script src="webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script src="webjars/popper.js/1.16.0/dist/umd/popper.min.js"></script>
+    <script src="webjars/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
+    <script src="webjars/bootstrap-select/1.13.17/js/i18n/defaults-sv_SE.min.js"></script>
+    <script src="webjars/highlightjs/9.15.10/highlight.min.js"></script>
+    <script src="webjars/jquery-cookie/1.4.1-1/jquery.cookie.js"></script>
+    <script src="js/result.js"></script>
+    <script src="js/lang.js"></script>
+
+    <link rel="stylesheet" th:href="${bootstrapCss}"/>
+    <link rel="stylesheet" href="webjars/font-awesome/5.13.0/css/all.min.css"/>
+    <link rel="stylesheet" href="webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css"/>
+    <link rel="stylesheet" href="webjars/highlightjs/9.15.10/styles/atom-one-light.css"/>
+    <link rel="stylesheet" href="css/main.css"/>
+    <link rel="stylesheet" href="css/result.css"/>
+
+    <title th:text="${htmlTitle}"></title>
+</head>
+<body>
+<div class="container">
+    <div class="card" style="margin-top: 10px">
+        <div class="card-header" style="text-align: center">
+            <h2>
+                <img align="left" th:src="${logoUrl}" alt="Logo" height="50">
+                <span th:if="${devmode}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
+                <img th:if="${secondaryLogoUrl != null}" align='right' th:src="${secondaryLogoUrl}" alt='Logo' height='50'>
+            </h2>
+        </div>
+        <div class="card-body">
+            <div style="float: right">
+                <a th:href="'javascript:selectLang(\'en\',\'' + ${lang} + '\',\'result\')'"
+                   th:class="${lang.equalsIgnoreCase('en') ? 'lang-selected':''}">en</a>
+                <a th:href="'javascript:selectLang(\'sv\',\'' + ${lang} + '\',\'result\')'"
+                   th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected':''}">sv</a>
+            </div>
+            <h4 th:text="${text.getString('title1')}"></h4>
+            <span th:text="${text.getString('document')}"></span><b th:text="${resultPageData.getDocumentName()}"></b>
+            <button th:if="${resultPageData.getDocumentType() != null}"
+                    class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
+                    onclick="$('#metadataViewDiv').fadeIn(700)"
+                    th:text="${text.getString('showDoc')}"></button>
+
+            <table class="table table-sm table-borderless" style="margin-top: 20px">
+                <tr>
+                    <td class="overall-param" th:text="${text.getString('status')}"></td>
+                    <th:block th:switch="${resultPageData.getStatus()}">
+                        <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).ok}">
+                            <i class='fas fa-check-circle icon-ok'></i>&nbsp;<span th:text="${text.getString('docOk')}"></span>
+                        </td>
+                        <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).unsigned}">
+                            <i class='fas fa-times-circle icon-error'></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
+                        </td>
+                        <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).novalidcoversdoc}">
+                            <i class='fas fa-times-circle icon-error'></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
+                        </td>
+                        <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).invalid}">
+                            <i class='fas fa-times-circle icon-error'></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
+                        </td>
+                        <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).someinvalid}">
+                            <i class='fas fa-exclamation-triangle icon-warning'></i>&nbsp;<span th:text="${text.getString('someinvalid')}"></span>
+                        </td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="overall-param" th:text="${text.getString('doctype')}"></td>
+                    <td th:text="${docType.name()}"></td>
+                </tr>
+                <!--
+                <tr>
+                    <td class="doc-valid-param"><%=resultText.get("sigcount")%>
+                    </td>
+                    <td class="doc-valid-param"><%=data.getNumberOfSignatures()%>
+                    </td>
+                </tr>
+                <tr>
+                    <td><%=resultText.get("validcount")%>
+                    </td>
+                    <td><%=data.getValidSignatures()%>
+                    </td>
+                </tr>
+                -->
+            </table>
+
+            <!-- Display each signature -->
+            <th:block th:each="sigData, sigDataStat : ${resultPageData.getResultSignatureDataList()}">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white"><h5 th:text="${text.getString('signature')} + ' ' + ${sigDataStat.count}"></h5></div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <td class="sig-res-param" th:text="${text.getString('status')}"><%=resultText.get("status")%>
+                            </td>
+                            <th:block th:switch="${sigData.getStatus()}">
+                                <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok}">
+                                    <i class='fas fa-check-circle icon-ok'></i>&nbsp;<span th:text="${text.getString('sigOK')}"></span>
+                                </td>
+                                <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).sigerror}">
+                                    <i class='fas fa-times-circle icon-error'></i></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
+                                </td>
+                                <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).invalidCert}">
+                                    <i class='fas fa-times-circle icon-error'></i></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
+                                </td>
+                                <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).incomplete}">
+                                    <i class='fas fa-times-circle icon-error'></i></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
+                                </td>
+                            </th:block>
+                        </tr>
+                        <tr>
+                            <td class="sig-res-param" th:text="${text.getString('coversDoc')}"></td>
+                            <td th:text="${sigData.isCoversAllData() ? text.getString('coverAll') : text.getString('coverSome')}"></td>
+                        </tr>
+                        <th:block th:if="${sigData.getIdp() != null}">
+                            <tr>
+                                <td class="sig-res-param" th:text="${text.getString('signtime')}"></td>
+                                <td th:text="${sigData.getSigningTime()}"></td>
+                            </tr>
+                            <tr>
+                                <td class="sig-res-param" th:text="${text.getString('idp')}"></td>
+                                <td th:text="${sigData.getIdp()}"></td>
+                            </tr>
+                            <tr>
+                                <td class="sig-res-param" th:text="${text.getString('sp')}"></td>
+                                <td th:text="${sigData.getServiceProvider()}"></td>
+                            </tr>
+                            <th:block th:if="${showLoa}">
+                                <tr>
+                                    <td class="sig-res-param" th:text="${text.getString('loa')}"></td>
+                                    <td th:text="${sigData.getLoa()}"></td>
+                                </tr>
+                            </th:block>
+                        </th:block>
+
+                    </table>
+                    <h6 class="text-dark"><b th:text="${text.getString('signer')}"></b></h6>
+                    <table class="table table-sm table-striped">
+                        <th:block th:each="attr, attrStat : ${sigData.getSignerAttribute()}">
+                            <tr>
+                                <td class="attr-td" th:text="${attr.getName()}"></td>
+                                <td th:text="${attr.getValue()}"></td>
+                            </tr>
+                        </th:block>
+                    </table>
+                </div>
+            </th:block>
+
+            <br>
+            <a class="btn btn-primary" href="home" th:text="${text.getString('home')}"></a>
+
+        </div>
+    </div>
+</div>
+
+<!-- Signed document display box -->
+<div id="metadataViewDiv" class="confirm-bgr">
+    <div class="card metadata-panel">
+        <div id="metadataTitleDiv" class="card-header">
+            <table style="width: 100%">
+                <tr>
+                    <td id="metadataTitleCell">
+                        <h5 th:text="${resultPageData.getDocumentName()}"></h5>
+                    </td>
+                    <td style="text-align: right">
+                        <button class="btn btn-sm btn-primary" style="margin-top: 10px" onclick="$('#metadataViewDiv').fadeOut(700);" th:text="${text.getString('close')}"></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="metadataBodyDiv" class="card-body">
+            <div id="metadataDisplayDiv">
+                show document here
+                <!--
+                <pre><code>"+request.getAttribute("xmlPrettyPrint")+"</code></pre>
+                <embed id='pdfFrame' src='inlinepdf' type='application/pdf' style='width: 100%'>
+
+                 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
