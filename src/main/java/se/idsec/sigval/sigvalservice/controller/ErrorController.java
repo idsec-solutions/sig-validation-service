@@ -53,7 +53,7 @@ public class ErrorController {
 
     @RequestMapping("/500")
     public String get500Error(Model model, @CookieValue(name = "langSelect", defaultValue = "sv") String lang) {
-        model.addAttribute("message", "Internt fel");
+        model.addAttribute("message", "Uppladdat dokument kunde inte hanteras");
         model.addAttribute("errorCode", "500");
         addModelAttributes(model, lang);
         return "error";

@@ -62,7 +62,7 @@ public class SignatureValidationController {
       validationResult = pdfValidator.extendedResultValidation(signedDoc);
       break;
     default:
-      throw new RuntimeException("");
+      throw new IOException("Unable to handle uploaded document - illegal document content");
     }
     ResultPageData resultPageData = resultPageDataGenerator.getResultPageData(validationResult, docName, docMimeType, lang);
     httpSession.setAttribute(SessionAttr.docType.name(), docType);
