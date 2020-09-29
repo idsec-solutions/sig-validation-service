@@ -14,4 +14,16 @@ $(document).ready(function () {
         hljs.highlightBlock(block);
         $(this).css("height", viewHeight);
     });
-})
+});
+
+function downloadSvt(type){
+
+    if (type ===0){
+        let win = window.open("xmldoc?target=svt", "_blank");
+        win.focus()
+    }
+    if (type ===1){
+        let win = window.open("pdfdoc?target=svt", "_blank");
+        win.focus()
+    }
+}

@@ -9,10 +9,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 import se.idsec.sigval.commons.document.DocType;
 import se.idsec.sigval.sigvalservice.configuration.FileSize;
+import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
+import se.idsec.sigval.svt.issuer.SVTModel;
+import se.idsec.sigval.xml.svt.XMLDocumentSVTMethod;
+import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -22,11 +29,15 @@ public class UploadController {
 
   private final HttpSession httpSession;
   private final FileSize maxFileSize;
+  private final SignatureValidatorProvider signatureValidatorProvider;
+  private final SVTModel svtModel;
 
   @Autowired
-  public UploadController(HttpSession httpSession, FileSize maxFileSize) {
+  public UploadController(HttpSession httpSession, FileSize maxFileSize,SignatureValidatorProvider signatureValidatorProvider,  SVTModel svtModel) {
     this.httpSession = httpSession;
     this.maxFileSize = maxFileSize;
+    this.signatureValidatorProvider = signatureValidatorProvider;
+    this.svtModel = svtModel;
   }
 
   @PostMapping("/sigupload")
@@ -72,61 +83,89 @@ public class UploadController {
   }
 
   @RequestMapping(value = "/pdfdoc", method = RequestMethod.GET, produces = "application/pdf")
-  public ResponseEntity<InputStreamResource> getPdfDocument() throws IOException {
+  public ResponseEntity<InputStreamResource> getPdfDocument(@RequestParam(value = "target", required = false) String target) throws IOException {
 
-    byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-    String tbsType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
-    String tbsName = (String) httpSession.getAttribute(SessionAttr.docName.name());
-    tbsName = tbsName.replaceAll("\\s*,\\s*", "-");
+    byte[] docBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
+    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
+    docName = docName.replaceAll("\\s*,\\s*", "-");
 
-    if (signedDoc == null || !tbsType.equalsIgnoreCase("application/pdf")) {
+    if (target == null) {
+      docBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    }
+    if (target.equalsIgnoreCase("svt")){
+      docBytes = issuePdfSvt();
+      docName = getSvtFileName(docName, docType);
+    }
+
+    if (docBytes == null || !docType.equalsIgnoreCase("application/pdf")) {
       throw new IllegalArgumentException("No PDF file is uploaded");
     }
 
     return ResponseEntity
       .ok()
-      .headers(getHeaders(tbsName, tbsType))
-      .contentLength(signedDoc.length)
+      .headers(getHeaders(docName))
+      .contentLength(docBytes.length)
       .contentType(MediaType.parseMediaType("application/octet-stream"))
-      .body(new InputStreamResource(new ByteArrayInputStream(signedDoc)));
+      .body(new InputStreamResource(new ByteArrayInputStream(docBytes)));
+  }
+
+  private byte[] issuePdfSvt() {
+    return null;
   }
 
   @RequestMapping(value = "/xmldoc", method = RequestMethod.GET, produces = "text/xml")
-  public ResponseEntity<InputStreamResource> getXmlDocument() throws IOException {
+  public ResponseEntity<InputStreamResource> getXmlDocument(@RequestParam(value = "target", required = false) String target)
+    throws Exception {
 
-    byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-    String tbsType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
-    String tbsName = (String) httpSession.getAttribute(SessionAttr.docName.name());
-    tbsName = tbsName.replaceAll("\\s*,\\s*", "-");
+    byte[] docbytes = new byte[]{};
+    String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
+    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
+    docName = docName.replaceAll("\\s*,\\s*", "-");
 
-    if (signedDoc == null || !tbsType.equalsIgnoreCase("text/xml")) {
+    if (target == null){
+      docbytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    }
+    if (target.equalsIgnoreCase("svt")){
+      docbytes =issueXmlSvt();
+      docName = getSvtFileName(docName, docType);
+    }
+
+    if (docbytes == null || !docType.equalsIgnoreCase("text/xml")) {
       throw new IllegalArgumentException("No XML file is uploaded");
     }
 
     return ResponseEntity
       .ok()
-      .headers(getHeaders(tbsName, tbsType))
-      .contentLength(signedDoc.length)
+      .headers(getHeaders(docName))
+      .contentLength(docbytes.length)
       .contentType(MediaType.parseMediaType("application/octet-stream"))
-      .body(new InputStreamResource(new ByteArrayInputStream(signedDoc)));
+      .body(new InputStreamResource(new ByteArrayInputStream(docbytes)));
   }
 
-  private HttpHeaders getHeaders(String fileName, String docType) {
+  private byte[] issueXmlSvt() throws Exception {
+    byte[] docbytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    Document document = XMLDocumentBuilder.getDocument(docbytes);
+    byte[] svtDocBytes = signatureValidatorProvider.getXmlDocumentSVTIssuer().issueSvt(document, svtModel, XMLDocumentSVTMethod.EXTEND);
+    return svtDocBytes;
+  }
+
+  private HttpHeaders getHeaders(String fileName) {
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-    headers.add("content-disposition", "inline; filename=" + getSignedFileName(fileName, docType));
+    headers.add("content-disposition", "inline; filename=" + fileName);
     headers.add("Pragma", "no-cache");
     headers.add("Expires", "0");
     return headers;
   }
 
-  private String getSignedFileName(String fileName, String tbsType) {
+  private String getSvtFileName(String fileName, String tbsType) {
 
     if (fileName.toLowerCase().endsWith(".xml") && tbsType.equalsIgnoreCase("text/xml")) {
-      return stripFileName(fileName) + "_signed.xml";
+      return stripFileName(fileName) + "_svt.xml";
     }
     if (fileName.toLowerCase().endsWith(".pdf") && tbsType.equalsIgnoreCase("application/pdf")) {
-      return stripFileName(fileName) + "_signed.pdf";
+      return stripFileName(fileName) + "_svt.pdf";
     }
     return fileName;
   }

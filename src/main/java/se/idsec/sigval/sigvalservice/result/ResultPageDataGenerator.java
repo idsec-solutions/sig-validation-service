@@ -104,6 +104,7 @@ public class ResultPageDataGenerator {
 
     // Set all generic data
     builder.coversAllData(signatureValResult.isCoversDocument());
+    builder.svt(signatureValResult.getSvtJWT() != null);
     SignatureValidationResult.Status status = signatureValResult.getStatus();
     switch (status) {
 
@@ -165,7 +166,7 @@ public class ResultPageDataGenerator {
           SamlAttribute samlAttr = SamlAttribute.getAttributeFromSamlName(attribute.getName());
           String attributeValue = new StringBuilder().append(attribute.getAttributeValues().get(0)).toString();
           return new DisplayAttribute(UIUtils.fromIso(
-            uiText.getBundle(UIText.UiBundle.samlAttr, lang).getString(samlAttr.name())), attributeValue, samlAttr.getDisplayOrder());
+            UIUtils.fromUtf(uiText.getBundle(UIText.UiBundle.samlAttr, lang).getString(samlAttr.name()))), attributeValue, samlAttr.getDisplayOrder());
         })
         .sorted(Comparator.comparingInt(DisplayAttribute::getOrder))
         .collect(Collectors.toList());
@@ -183,7 +184,7 @@ public class ResultPageDataGenerator {
         .map(subjectDnAttribute -> {
           String name = subjectDnAttribute.equals(SubjectDnAttribute.unknown)
             ? subjectDnAttribute.getOid()
-            : UIUtils.fromIso(uiText.getBundle(UIText.UiBundle.x509Attr, lang).getString(subjectDnAttribute.name()));
+            : uiText.getBundle(UIText.UiBundle.x509Attr, lang).getString(subjectDnAttribute.name());
           return new DisplayAttribute(name,subjectAttributes.get(subjectDnAttribute), subjectDnAttribute.getOrder());
         })
         .sorted(Comparator.comparingInt(DisplayAttribute::getOrder))

@@ -16,6 +16,7 @@ public class ResultSignatureData {
 
   private SigValidStatus status;
   private boolean coversAllData;
+  private boolean svt;
   private String idp;
   private String signingTime;
   private String loa;

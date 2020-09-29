@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.xml.sax.SAXException;
 import se.idsec.sigval.commons.data.ExtendedSigValResult;
 import se.idsec.sigval.commons.data.SignedDocumentValidationResult;
 import se.idsec.sigval.commons.document.DocType;
@@ -13,9 +14,13 @@ import se.idsec.sigval.sigvalservice.configuration.FileSize;
 import se.idsec.sigval.sigvalservice.configuration.ui.LogoImages;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIStyle;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIText;
+import se.idsec.sigval.sigvalservice.result.ResultPageDataGenerator;
 import se.idsec.sigval.sigvalservice.result.data.ResultPageData;
+import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 @Slf4j
 @Controller
@@ -29,27 +34,35 @@ public class ResultController {
   private final FileSize maxFileSize;
   private final HttpSession httpSession;
   private final LogoImages logoImages;
+  private final ResultPageDataGenerator resultPageDataGenerator;
 
 
-  public ResultController(UIText uiText, FileSize maxFileSize, HttpSession httpSession, LogoImages logoImages) {
+  public ResultController(UIText uiText, FileSize maxFileSize, HttpSession httpSession, LogoImages logoImages, ResultPageDataGenerator resultPageDataGenerator) {
     this.uiText = uiText;
     this.maxFileSize = maxFileSize;
     this.httpSession = httpSession;
     this.logoImages = logoImages;
+    this.resultPageDataGenerator = resultPageDataGenerator;
   }
 
   @RequestMapping("/result")
-  public String getResultPage(Model model, @CookieValue(name = "langSelect", defaultValue = "sv") String lang) {
+  public String getResultPage(Model model, @CookieValue(name = "langSelect", defaultValue = "sv") String lang)
+    throws ParserConfigurationException, SAXException, IOException {
 
-    //byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-    //String docMimeType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
-    //String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
+    byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    String docMimeType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
+    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
     DocType docType = (DocType) httpSession.getAttribute(SessionAttr.docType.name());
     SignedDocumentValidationResult<? extends ExtendedSigValResult> validationResult =
       (SignedDocumentValidationResult<? extends ExtendedSigValResult>) httpSession.getAttribute(SessionAttr.validationResult.name());
-    ResultPageData resultPageData = (ResultPageData) httpSession.getAttribute(SessionAttr.resultPageData.name());
+
+    ResultPageData resultPageData = resultPageDataGenerator.getResultPageData(validationResult, docName, docMimeType, lang);
+
+    //ResultPageData resultPageData = (ResultPageData) httpSession.getAttribute(SessionAttr.resultPageData.name());
 
     if (resultPageData == null || validationResult == null) return "redirect:/";
+
+    String xmlPrettyPrint = docType.equals(DocType.XML) ? XMLDocumentBuilder.getDocText(XMLDocumentBuilder.getDocument(signedDoc)) : null;
 
     // Set view model
     model.addAttribute("bootstrapCss", UIStyle.valueOf(style).getBootrapSrc());
@@ -63,6 +76,7 @@ public class ResultController {
     model.addAttribute("text", uiText.getBundle(UIText.UiBundle.resultText, lang));
     model.addAttribute("docType", docType);
     model.addAttribute("showLoa", true);
+    model.addAttribute("xmlPrettyPrint", xmlPrettyPrint);
 
     //
     int sdfds = 0;

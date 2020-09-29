@@ -48,11 +48,15 @@
                    th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected':''}">sv</a>
             </div>
             <h4 th:text="${text.getString('title1')}"></h4>
-            <span th:text="${text.getString('document')}"></span><b th:text="${resultPageData.getDocumentName()}"></b>
+            <span th:text="${text.getString('document')}"></span><b th:text="${resultPageData.getDocumentName()}"></b>&nbsp;&nbsp;
             <button th:if="${resultPageData.getDocumentType() != null}"
                     class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
                     onclick="$('#metadataViewDiv').fadeIn(700)"
-                    th:text="${text.getString('showDoc')}"></button>
+                    th:text="${text.getString('showDoc')}"></button>&nbsp;&nbsp;&nbsp;
+            <button th:if="${resultPageData.getStatus().name().equalsIgnoreCase('ok')}"
+                    class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
+                    th:onclick="'downloadSvt(' + ${docType.equals(T(se.idsec.sigval.commons.document.DocType).XML) ? 0 : 1} + ')'"
+                    >Create SVT document</button>&nbsp;&nbsp;&nbsp;
 
             <table class="table table-sm table-borderless" style="margin-top: 20px">
                 <tr>
@@ -121,6 +125,10 @@
                             </th:block>
                         </tr>
                         <tr>
+                            <td class="sig-res-param">Validation type</td>
+                            <td th:text="${sigData.isSvt() ? 'Signature Validation Token' : 'Signature Validation'}"></td>
+                        </tr>
+                        <tr>
                             <td class="sig-res-param" th:text="${text.getString('coversDoc')}"></td>
                             <td th:text="${sigData.isCoversAllData() ? text.getString('coverAll') : text.getString('coverSome')}"></td>
                         </tr>
@@ -182,12 +190,10 @@
         </div>
         <div id="metadataBodyDiv" class="card-body">
             <div id="metadataDisplayDiv">
-                show document here
-                <!--
-                <pre><code>"+request.getAttribute("xmlPrettyPrint")+"</code></pre>
-                <embed id='pdfFrame' src='inlinepdf' type='application/pdf' style='width: 100%'>
-
-                 -->
+                <th:block th:switch="${docType}">
+                    <pre th:case="${T(se.idsec.sigval.commons.document.DocType).XML}"><code th:text="${xmlPrettyPrint}"></code></pre>
+                    <embed th:case="${T(se.idsec.sigval.commons.document.DocType).PDF}" id='pdfFrame' src='inlinepdf?target=signed' type='application/pdf' style='width: 100%'>
+                </th:block>
             </div>
         </div>
     </div>
