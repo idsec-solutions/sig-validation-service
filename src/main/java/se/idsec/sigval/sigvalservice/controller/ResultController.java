@@ -37,15 +37,13 @@ public class ResultController {
   @Value("${sigval-service.ui.show-loa}") boolean showLoa;
 
   private final UIText uiText;
-  private final FileSize maxFileSize;
   private final HttpSession httpSession;
   private final LogoImages logoImages;
   private final ResultPageDataGenerator resultPageDataGenerator;
 
 
-  public ResultController(UIText uiText, FileSize maxFileSize, HttpSession httpSession, LogoImages logoImages, ResultPageDataGenerator resultPageDataGenerator) {
+  public ResultController(UIText uiText, HttpSession httpSession, LogoImages logoImages, ResultPageDataGenerator resultPageDataGenerator) {
     this.uiText = uiText;
-    this.maxFileSize = maxFileSize;
     this.httpSession = httpSession;
     this.logoImages = logoImages;
     this.resultPageDataGenerator = resultPageDataGenerator;

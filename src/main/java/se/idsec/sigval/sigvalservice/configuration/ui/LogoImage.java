@@ -26,7 +26,7 @@ public class LogoImage {
       init (new File(source.substring(7)));
       return;
     }
-    init (new File(source.substring(7)));
+    init (new File(source));
   }
 
   public LogoImage(File logoFile) {

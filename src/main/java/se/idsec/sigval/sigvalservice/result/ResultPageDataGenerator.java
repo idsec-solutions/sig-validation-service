@@ -106,6 +106,7 @@ public class ResultPageDataGenerator {
     // Set all generic data
     builder.coversAllData(signatureValResult.isCoversDocument());
     builder.svt(signatureValResult.getSvtJWT() != null);
+    builder.signedDataAvailable(signatureValResult.getSignedDocument() != null);
     SignatureValidationResult.Status status = signatureValResult.getStatus();
     switch (status) {
 
@@ -195,7 +196,7 @@ public class ResultPageDataGenerator {
         .loa(authContextInfo.getAuthnContextClassRef())
         .signingTime(dateFormat.format(authContextInfo.getAuthenticationInstant().toGregorianCalendar().getTime()))
         .serviceProvider(authContextInfo.getServiceID());
-      List<DisplayAttribute> displayAttributes = getAttrsFromAuthContextExt(signerCertificate, authContextExtData, lang);
+      List<DisplayAttribute> displayAttributes = getAttrsFromAuthContextExt(authContextExtData, lang);
       builder.signerAttribute(displayAttributes);
       return;
     }
@@ -206,7 +207,8 @@ public class ResultPageDataGenerator {
     builder.signerAttribute(displayAttributes);
   }
 
-  private List<DisplayAttribute> getAttrsFromAuthContextExt(X509Certificate signCert, SAMLAuthContext authContextExtData, String lang) {
+  private List<DisplayAttribute> getAttrsFromAuthContextExt(SAMLAuthContext authContextExtData, String lang) {
+    if (authContextExtData == null) return new ArrayList<>();
     try {
       List<AttributeMapping> attributeMappings = authContextExtData.getIdAttributes().getAttributeMappings();
       return attributeMappings.stream()
@@ -227,6 +229,7 @@ public class ResultPageDataGenerator {
   }
 
   private List<DisplayAttribute> getAttrsFromSubjectField(X509Certificate signCert, String lang) {
+    if (signCert == null) return new ArrayList<>();
     try {
       Map<SubjectDnAttribute, String> subjectAttributes = CertUtils.getSubjectAttributes(signCert);
       return subjectAttributes.keySet().stream()
@@ -239,7 +242,7 @@ public class ResultPageDataGenerator {
         .sorted(Comparator.comparingInt(DisplayAttribute::getOrder))
         .collect(Collectors.toList());
     } catch (IOException ex) {
-      log.error("Unable to parse subject name from certificate" , ex);
+      log.error("Unable to parse subject name from certificate", ex);
       return new ArrayList<>();
     }
   }

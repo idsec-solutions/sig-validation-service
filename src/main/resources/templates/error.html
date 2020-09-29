@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="description" content="SUNET Sign Service Demo"/>
-    <meta name="author" content="stefan - Sweden Connect"/>
+    <meta name="description" content="Signature Validation Service"/>
+    <meta name="author" content="IDsec Solutions AB"/>
     <meta http-equiv='pragma' content='no-cache'/>
     <meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate'/>
     <meta http-equiv="Expires" content="-1"/>
@@ -16,31 +16,33 @@
     <script src="webjars/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
     <script src="webjars/bootstrap-select/1.13.17/js/i18n/defaults-sv_SE.min.js"></script>
-    <script src="webjars/bootstrap-fileinput/5.1.0/js/fileinput.min.js"></script>
-    <script src="webjars/bootstrap-fileinput/5.1.0/js/locales/sv.js"></script>
     <script src="webjars/jquery-cookie/1.4.1-1/jquery.cookie.js"></script>
 
-    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="${bootstrapCss}"/>
+    <link rel="stylesheet" href="webjars/font-awesome/5.13.0/css/all.min.css"/>
     <link rel="stylesheet" href="webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css"/>
-    <link rel="stylesheet" href="webjars/bootstrap-fileinput/5.1.0/css/fileinput.min.css">
+    <link rel="stylesheet" href="webjars/highlightjs/9.15.10/styles/atom-one-light.css"/>
 
-    <title>Title</title>
+    <title th:text="${htmlTitle}"></title>
 </head>
 <body>
-
 <div class="container">
     <div class="card" style="margin-top: 10px">
-        <div class="card-header bg-primary text-white"><h1>Signature validation service</h1></div>
+        <div class="card-header" style="text-align: center">
+            <h2>
+                <img align="left" th:src="${logoUrl}" alt="Logo" height="50">
+                <span th:if="${devmode}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
+                <img th:if="${secondaryLogoUrl != null}" align='right' th:src="${secondaryLogoUrl}" alt='Logo' height='50'>
+            </h2>
+        </div>
         <div class="card-body">
-            <p>This will be the new signature validation service main page</p>
-            <input type="text" size="40" id="textInp"><br/>
-            <button class="btn btn-primary" style="margin-top: 10px" onclick="alert('HELP '+$('#textInp').val()+'!!!!')">Click me</button>
-            <br/>
-            <a href="home">Home</a>
+            <h5>Ett fel har inträffat.</h5>
+            <!--/*@thymesVar id="message" type="java.lang.String"*/-->
+            <div th:if="${message != null}" th:text="${message}" style="margin-bottom: 20px; color: darkred"></div>
+            <a href="home" class="btn btn-primary">Tillbaka</a>
         </div>
     </div>
 </div>
-
 
 </body>
 </html>

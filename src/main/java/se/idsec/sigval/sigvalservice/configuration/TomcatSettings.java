@@ -35,7 +35,7 @@ public class TomcatSettings {
             webServerFactory.addAdditionalTomcatConnectors(connector);
         }
         webServerFactory.addErrorPages(
-                new ErrorPage(HttpStatus.NOT_FOUND, "/404"),
+                new ErrorPage(HttpStatus.NOT_FOUND, "/404-redirect"),
                 new ErrorPage(HttpStatus.BAD_REQUEST, "/400"),
                 new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/500")
         );

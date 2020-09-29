@@ -133,7 +133,7 @@
                             <td>
                                 <span th:text="${sigData.isCoversAllData() ? text.getString('coverAll') : text.getString('coverSome')}"></span>
                                 &nbsp;
-                                <button th:if="${enableSignedDataView}"
+                                <button th:if="${enableSignedDataView && sigData.isSignedDataAvailable()}"
                                         class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
                                         th:onclick="'$(\'#sigDataDiv-' + ${sigDataStat.count} +'\').fadeIn(700);'"
                                         th:text="${text.getString('showSignedContent')}"></button>
@@ -166,7 +166,7 @@
                         </tr>
 
                     </table>
-                    <h6 class="text-dark"><b th:text="${text.getString('signer')}"></b></h6>
+                    <h6 th:if="${sigData.getSignerAttribute().size() > 0}" class="text-dark"><b th:text="${text.getString('signer')}"></b></h6>
                     <table class="table table-sm table-striped">
                         <th:block th:each="attr, attrStat : ${sigData.getSignerAttribute()}">
                             <tr>
