@@ -1,5 +1,6 @@
 package se.idsec.sigval.sigvalservice.controller;
 
+import com.nimbusds.jwt.SignedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.w3c.dom.Document;
+import se.idsec.sigval.pdf.timestamp.issue.impl.PDFDocTimstampProcessor;
 import se.idsec.sigval.sigvalservice.configuration.FileSize;
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 import se.idsec.sigval.svt.issuer.SVTModel;
@@ -36,7 +38,7 @@ public class SVTIssuanceController {
   }
 
   @RequestMapping(value = "/pdfsvt", method = RequestMethod.GET, produces = "application/pdf")
-  public ResponseEntity<InputStreamResource> getPdfDocument() throws IOException {
+  public ResponseEntity<InputStreamResource> getPdfDocument() throws Exception {
 
     byte[] svtDocBytes = (byte[]) httpSession.getAttribute(SessionAttr.svtDocument.name());
     String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
@@ -48,6 +50,11 @@ public class SVTIssuanceController {
 
       //TODO Issue PDF SVT
       //svtDocBytes = Issue SVT from signedDoc;
+      SignedJWT signedSvtJWT = signatureValidatorProvider.getPdfsvtSigValClaimsIssuer().getSignedSvtJWT(signedDoc, svtModel);
+      PDFDocTimstampProcessor.Result result = PDFDocTimstampProcessor.createSVTSealedPDF(
+        signedDoc, signedSvtJWT.serialize(), signatureValidatorProvider.getSvtTsSigner());
+
+      svtDocBytes = result.getDocument();
 
       httpSession.setAttribute(SessionAttr.svtDocument.name(), svtDocBytes);
     }

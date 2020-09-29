@@ -33,6 +33,8 @@ public class ResultController {
   @Value("${sigval-service.ui.style}") String style;
   @Value("${sigval-service.ui.devmode}") boolean devmode;
   @Value("${sigval-service.ui.issue-svt-if-svt-exist}") boolean issueSvtIfExists;
+  @Value("${sigval-service.ui.enalbe-signed-data-view}") boolean enableSignedDataView;
+  @Value("${sigval-service.ui.show-loa}") boolean showLoa;
 
   private final UIText uiText;
   private final FileSize maxFileSize;
@@ -60,9 +62,8 @@ public class ResultController {
     SignedDocumentValidationResult<? extends ExtendedSigValResult> validationResult =
       (SignedDocumentValidationResult<? extends ExtendedSigValResult>) httpSession.getAttribute(SessionAttr.validationResult.name());
 
+    if (validationResult == null) return "redirect:/";
     ResultPageData resultPageData = resultPageDataGenerator.getResultPageData(validationResult, docName, docMimeType, lang);
-
-    if (resultPageData == null || validationResult == null) return "redirect:/";
 
     String xmlPrettyPrint = docType.equals(DocType.XML) ? XMLDocumentBuilder.getDocText(XMLDocumentBuilder.getDocument(signedDoc)) : null;
 
@@ -95,10 +96,11 @@ public class ResultController {
     model.addAttribute("lang", lang);
     model.addAttribute("text", uiText.getBundle(UIText.UiBundle.resultText, lang));
     model.addAttribute("docType", docType);
-    model.addAttribute("showLoa", true);
+    model.addAttribute("showLoa", showLoa);
     model.addAttribute("xmlPrettyPrint", xmlPrettyPrint);
     model.addAttribute("signedDocs", signedDocumentList);
     model.addAttribute("svtAvailable", svtAvailable || issueSvtIfExists);
+    model.addAttribute("enableSignedDataView", enableSignedDataView);
 
     return "sigvalresult";
   }

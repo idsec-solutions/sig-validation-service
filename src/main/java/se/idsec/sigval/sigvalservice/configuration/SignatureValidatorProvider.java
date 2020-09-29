@@ -4,9 +4,12 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgorithmRegistry;
 import se.idsec.sigval.commons.algorithms.JWSAlgorithmRegistry;
 import se.idsec.sigval.commons.algorithms.PublicKeyType;
 import se.idsec.sigval.commons.timestamp.TimeStampPolicyVerifier;
@@ -15,6 +18,7 @@ import se.idsec.sigval.commons.utils.GeneralCMSUtils;
 import se.idsec.sigval.pdf.pdfstruct.impl.DefaultPDFSignatureContextFactory;
 import se.idsec.sigval.pdf.svt.PDFSVTSigValClaimsIssuer;
 import se.idsec.sigval.pdf.svt.PDFSVTValidator;
+import se.idsec.sigval.pdf.timestamp.issue.impl.DefaultPDFDocTimestampSignatureInterface;
 import se.idsec.sigval.pdf.verify.ExtendedPDFSignatureValidator;
 import se.idsec.sigval.pdf.verify.PDFSingleSignatureValidator;
 import se.idsec.sigval.pdf.verify.impl.PDFSingleSignatureValidatorImpl;
@@ -47,7 +51,9 @@ public class SignatureValidatorProvider {
   private final LocalKeySource svtKeySource;
 
   @Value("${sigval-service.svt.model.sig-algo}") String svtSigAlgo;
+  @Value("${sigval-service.svt.timestamp.policy:#{null}}") String timestampPolicy;
 
+  @Getter private DefaultPDFDocTimestampSignatureInterface svtTsSigner;
   @Getter private PDFSVTSigValClaimsIssuer pdfsvtSigValClaimsIssuer;
   @Getter private ExtendedPDFSignatureValidator pdfSignatureValidator;
   @Getter private XMLDocumentSVTIssuer xmlDocumentSVTIssuer;
@@ -73,6 +79,18 @@ public class SignatureValidatorProvider {
     xmlDocumentSVTIssuer = xmlDocumentSVTIssuer();
     pdfSignatureValidator = pdfSignatureValidator();
     pdfsvtSigValClaimsIssuer = pdfsvtSigValClaimsIssuer();
+    svtTsSigner = svtTsSigner();
+  }
+
+  private DefaultPDFDocTimestampSignatureInterface svtTsSigner() {
+    DefaultPDFDocTimestampSignatureInterface timeStampSigner = new DefaultPDFDocTimestampSignatureInterface(
+      svtKeySource.getCredential().getPrivateKey(),
+      Collections.singletonList(svtKeySource.getCredential().getEntityCertificate()),
+      SVTAlgoRegistry.getAlgoParams(svtJWSAlgorithm).getSigAlgoId());
+    if (StringUtils.isNotEmpty(timestampPolicy)){
+      timeStampSigner.setTimeStampPolicyOid(new ASN1ObjectIdentifier(timestampPolicy));
+    }
+    return timeStampSigner;
   }
 
   PDFSVTSigValClaimsIssuer pdfsvtSigValClaimsIssuer() throws NoSuchAlgorithmException, JOSEException {

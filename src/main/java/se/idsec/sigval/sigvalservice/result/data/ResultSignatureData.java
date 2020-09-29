@@ -22,6 +22,8 @@ public class ResultSignatureData {
   private String loa;
   private String assertionRef;
   private String serviceProvider;
+  private String timeStampTime;
+  private String timeStampType;
   List<DisplayAttribute> signerAttribute;
 
 }

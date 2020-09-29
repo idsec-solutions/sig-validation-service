@@ -6,13 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 import se.idsec.sigval.commons.data.ExtendedSigValResult;
+import se.idsec.sigval.commons.data.SigValIdentifiers;
 import se.idsec.sigval.commons.data.SignedDocumentValidationResult;
+import se.idsec.sigval.commons.data.TimeValidationResult;
 import se.idsec.sigval.pdf.data.ExtendedPdfSigValResult;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIText;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIUtils;
 import se.idsec.sigval.sigvalservice.result.cert.CertUtils;
 import se.idsec.sigval.sigvalservice.result.cert.SubjectDnAttribute;
 import se.idsec.sigval.sigvalservice.result.data.*;
+import se.idsec.sigval.svt.claims.PolicyValidationClaims;
+import se.idsec.sigval.svt.claims.ValidationConclusion;
 import se.idsec.sigval.xml.data.ExtendedXmlSigvalResult;
 import se.idsec.x509cert.extensions.AuthnContext;
 import se.swedenconnect.schemas.cert.authcont.saci_1_0.AttributeMapping;
@@ -23,10 +27,7 @@ import se.swedenconnect.schemas.saml_2_0.assertion.Attribute;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -122,6 +123,10 @@ public class ResultPageDataGenerator {
       builder.status(SigValidStatus.sigerror);
     }
 
+    //Set timestamp
+    addTimeStamptime(signatureValResult, builder);
+
+    //Set certificate data
     X509Certificate signerCertificate = signatureValResult.getSignerCertificate();
     setSignerCertData(signerCertificate, builder, lang);
 
@@ -132,6 +137,50 @@ public class ResultPageDataGenerator {
       return getPdfSigResult(
         (ExtendedPdfSigValResult) signatureValResult, builder.build());
     return builder.build();
+  }
+
+  private void addTimeStamptime(ExtendedSigValResult signatureValResult,
+    ResultSignatureData.ResultSignatureDataBuilder builder) {
+    List<TimeValidationResult> timeValidationResults = signatureValResult.getTimeValidationResults();
+    if (timeValidationResults == null || timeValidationResults.isEmpty()) return;
+    Date eariestTime = new Date();
+    boolean foundValidTime = false;
+    String type = null;
+    for (TimeValidationResult tsResult: timeValidationResults){
+      try {
+        List<PolicyValidationClaims> validationClaims = tsResult.getTimeValidationClaims().getVal();
+        boolean valid = validationClaims.stream()
+          .anyMatch(policyValidationClaims -> policyValidationClaims.getRes().equals(ValidationConclusion.PASSED));
+        if (valid) {
+          foundValidTime = true;
+          Date tsTime = new Date(tsResult.getTimeValidationClaims().getTime() > Long.parseLong("99999999999")
+            ? tsResult.getTimeValidationClaims().getTime()
+            : tsResult.getTimeValidationClaims().getTime() * 1000);
+          if (tsTime.before(eariestTime)){
+            eariestTime = tsTime;
+            type = getTypeId(tsResult.getTimeValidationClaims().getType());
+          }
+        }
+      } catch (Exception ex) {
+        log.error("failed to parse signature timestamp data");
+      }
+    }
+    if (foundValidTime) {
+      builder.timeStampTime(dateFormat.format(eariestTime));
+      builder.timeStampType(type);
+    }
+  }
+
+  private String getTypeId(String type) {
+    switch (type) {
+    case SigValIdentifiers.TIME_VERIFICATION_TYPE_PDF_DOC_TIMESTAMP:
+      return "docTimestamp";
+    case SigValIdentifiers.TIME_VERIFICATION_TYPE_SIG_TIMESTAMP:
+      return "sigTimestamp";
+    case SigValIdentifiers.TIME_VERIFICATION_TYPE_SVT:
+      return "svt";
+    }
+    return null;
   }
 
   private void setSignerCertData(X509Certificate signerCertificate, ResultSignatureData.ResultSignatureDataBuilder builder, String lang) {
