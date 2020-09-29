@@ -51,7 +51,7 @@
             <span th:text="${text.getString('document')}"></span><b th:text="${resultPageData.getDocumentName()}"></b>&nbsp;&nbsp;
             <button th:if="${resultPageData.getDocumentType() != null}"
                     class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
-                    onclick="$('#metadataViewDiv').fadeIn(700)"
+                    onclick="$('#sigDataDiv').fadeIn(700)"
                     th:text="${text.getString('showDoc')}"></button>&nbsp;&nbsp;&nbsp;
             <button th:if="${resultPageData.getStatus().name().equalsIgnoreCase('ok') && svtAvailable}"
                     class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
@@ -180,22 +180,22 @@
 </div>
 
 <!-- Signed document display box -->
-<div id="metadataViewDiv" class="confirm-bgr">
+<div id="sigDataDiv" class="confirm-bgr">
     <div class="card metadata-panel">
-        <div id="metadataTitleDiv" class="card-header">
+        <div class="card-header">
             <table style="width: 100%">
                 <tr>
-                    <td id="metadataTitleCell">
+                    <td>
                         <h5 th:text="${resultPageData.getDocumentName()}"></h5>
                     </td>
                     <td style="text-align: right">
-                        <button class="btn btn-sm btn-primary" style="margin-top: 10px" onclick="$('#metadataViewDiv').fadeOut(700);" th:text="${text.getString('close')}"></button>
+                        <button class="btn btn-sm btn-primary" style="margin-top: 10px" onclick="$('#sigDataDiv').fadeOut(700);" th:text="${text.getString('close')}"></button>
                     </td>
                 </tr>
             </table>
         </div>
-        <div id="metadataBodyDiv" class="card-body">
-            <div id="metadataDisplayDiv">
+        <div class="card-body">
+            <div id="sigDataDisplayDiv">
                 <th:block th:switch="${docType}">
                     <pre th:case="${T(se.idsec.sigval.commons.document.DocType).XML}"><code th:text="${xmlPrettyPrint}"></code></pre>
                     <embed th:case="${T(se.idsec.sigval.commons.document.DocType).PDF}" id='pdfFrame' src='inlinepdf' type='application/pdf' style='width: 100%'>
@@ -209,10 +209,10 @@
     <!-- Signed document display box -->
     <div th:id="'sigDataDiv-'+${sigDataStat.count}" class="confirm-bgr">
         <div class="card metadata-panel">
-            <div th:id="'sigDataTitleDiv-'+${sigDataStat.count}" class="card-header">
+            <div class="card-header">
                 <table style="width: 100%">
                     <tr>
-                        <td th:id="'sigDataTitleCell-'+${sigDataStat.count}">
+                        <td>
                             <h5 th:text="${text.getString('contentSignedBySignature')} + ' ' + ${sigDataStat.count}"></h5>
                         </td>
                         <td style="text-align: right">
@@ -221,7 +221,7 @@
                     </tr>
                 </table>
             </div>
-            <div th:id="'sigDataBodyDiv-'+${sigDataStat.count}" class="card-body">
+            <div class="card-body">
                 <div th:id="'sigDataDisplayDiv-'+${sigDataStat.count}">
                     <th:block th:switch="${docType}">
                         <pre th:case="${T(se.idsec.sigval.commons.document.DocType).XML}"><code th:text="${sigData}"></code></pre>
