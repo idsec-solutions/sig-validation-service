@@ -7,7 +7,7 @@ $(document).ready(function () {
     $('#metadataDisplayDiv').attr("overflow", "auto")
 
     if ($("#pdfFrame").length){
-        $("#pdfFrame").css("height", viewHeight)
+        $('[id^=pdfFrame]').css("height", viewHeight)
     }
 
     $('pre code').each(function (i, block) {
@@ -16,14 +16,7 @@ $(document).ready(function () {
     });
 });
 
-function downloadSvt(type){
-
-    if (type ===0){
-        let win = window.open("xmldoc?target=svt", "_blank");
-        win.focus()
-    }
-    if (type ===1){
-        let win = window.open("pdfdoc?target=svt", "_blank");
-        win.focus()
-    }
+function downloadSvt(){
+    let win = window.open("issue-svt", "_blank");
+    win.focus()
 }

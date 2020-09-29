@@ -3,25 +3,17 @@ package se.idsec.sigval.sigvalservice.controller;
 import lombok.extern.log4j.Log4j2;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import se.idsec.sigval.commons.data.ExtendedSigValResult;
+import se.idsec.sigval.commons.data.SignedDocumentValidationResult;
 import se.idsec.sigval.commons.document.DocType;
 import se.idsec.sigval.sigvalservice.configuration.FileSize;
-import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
-import se.idsec.sigval.svt.issuer.SVTModel;
-import se.idsec.sigval.xml.svt.XMLDocumentSVTMethod;
 import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
 
 import javax.servlet.http.HttpSession;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -29,15 +21,11 @@ public class UploadController {
 
   private final HttpSession httpSession;
   private final FileSize maxFileSize;
-  private final SignatureValidatorProvider signatureValidatorProvider;
-  private final SVTModel svtModel;
 
   @Autowired
-  public UploadController(HttpSession httpSession, FileSize maxFileSize,SignatureValidatorProvider signatureValidatorProvider,  SVTModel svtModel) {
+  public UploadController(HttpSession httpSession, FileSize maxFileSize) {
     this.httpSession = httpSession;
     this.maxFileSize = maxFileSize;
-    this.signatureValidatorProvider = signatureValidatorProvider;
-    this.svtModel = svtModel;
   }
 
   @PostMapping("/sigupload")
@@ -65,126 +53,47 @@ public class UploadController {
     return "[]";
   }
 
+  /**
+   * Just returns the bytes of a PDF document for display on the web page
+   * @param id indicator of id of the signed document or null to get the uploaded validated document
+   * @return the bytes of the referenced document
+   * @throws IOException on failure to obtain the requested document
+   */
   @RequestMapping(value = "/inlinepdf", method = RequestMethod.GET, produces = "application/pdf")
-  public byte[] getInlinePdfDocument(@RequestParam(value = "target", required = false) String target) throws IOException {
+  public byte[] getInlinePdfDocument(
+    @RequestParam(value = "id", required = false) String id) throws IOException{
     byte[] docBytes = null;
-    if (target != null && target.equalsIgnoreCase("signed")) {
+    if (id == null) {
       docBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
     }
     else {
-      docBytes = (byte[]) httpSession.getAttribute("tbsBytes");
+      try {
+        docBytes =((SignedDocumentValidationResult<? extends ExtendedSigValResult>) httpSession.getAttribute(SessionAttr.validationResult.name()))
+          .getSignatureValidationResults().get(Integer.valueOf(id)).getSignedDocument();
+      } catch (Exception ex){
+        log.info("unable to locate the signed PDF document bytes of signature with id: {}", id);
+      }
     }
     String docMimeType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
 
     if (docBytes == null || !docMimeType.equalsIgnoreCase("application/pdf")) {
-      throw new IllegalArgumentException("Target PDF file is not available");
+      throw new IOException("Target PDF file is not available");
     }
     return docBytes;
   }
 
-  @RequestMapping(value = "/pdfdoc", method = RequestMethod.GET, produces = "application/pdf")
-  public ResponseEntity<InputStreamResource> getPdfDocument(@RequestParam(value = "target", required = false) String target) throws IOException {
-
-    byte[] docBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-    String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
-    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
-    docName = docName.replaceAll("\\s*,\\s*", "-");
-
-    if (target == null) {
-      docBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-    }
-    if (target.equalsIgnoreCase("svt")){
-      docBytes = issuePdfSvt();
-      docName = getSvtFileName(docName, docType);
-    }
-
-    if (docBytes == null || !docType.equalsIgnoreCase("application/pdf")) {
-      throw new IllegalArgumentException("No PDF file is uploaded");
-    }
-
-    return ResponseEntity
-      .ok()
-      .headers(getHeaders(docName))
-      .contentLength(docBytes.length)
-      .contentType(MediaType.parseMediaType("application/octet-stream"))
-      .body(new InputStreamResource(new ByteArrayInputStream(docBytes)));
-  }
-
-  private byte[] issuePdfSvt() {
-    return null;
-  }
-
-  @RequestMapping(value = "/xmldoc", method = RequestMethod.GET, produces = "text/xml")
-  public ResponseEntity<InputStreamResource> getXmlDocument(@RequestParam(value = "target", required = false) String target)
-    throws Exception {
-
-    byte[] docbytes = new byte[]{};
-    String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
-    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
-    docName = docName.replaceAll("\\s*,\\s*", "-");
-
-    if (target == null){
-      docbytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-    }
-    if (target.equalsIgnoreCase("svt")){
-      docbytes =issueXmlSvt();
-      docName = getSvtFileName(docName, docType);
-    }
-
-    if (docbytes == null || !docType.equalsIgnoreCase("text/xml")) {
-      throw new IllegalArgumentException("No XML file is uploaded");
-    }
-
-    return ResponseEntity
-      .ok()
-      .headers(getHeaders(docName))
-      .contentLength(docbytes.length)
-      .contentType(MediaType.parseMediaType("application/octet-stream"))
-      .body(new InputStreamResource(new ByteArrayInputStream(docbytes)));
-  }
-
-  private byte[] issueXmlSvt() throws Exception {
-    byte[] docbytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-    Document document = XMLDocumentBuilder.getDocument(docbytes);
-    byte[] svtDocBytes = signatureValidatorProvider.getXmlDocumentSVTIssuer().issueSvt(document, svtModel, XMLDocumentSVTMethod.EXTEND);
-    return svtDocBytes;
-  }
-
-  private HttpHeaders getHeaders(String fileName) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-    headers.add("content-disposition", "inline; filename=" + fileName);
-    headers.add("Pragma", "no-cache");
-    headers.add("Expires", "0");
-    return headers;
-  }
-
-  private String getSvtFileName(String fileName, String tbsType) {
-
-    if (fileName.toLowerCase().endsWith(".xml") && tbsType.equalsIgnoreCase("text/xml")) {
-      return stripFileName(fileName) + "_svt.xml";
-    }
-    if (fileName.toLowerCase().endsWith(".pdf") && tbsType.equalsIgnoreCase("application/pdf")) {
-      return stripFileName(fileName) + "_svt.pdf";
-    }
-    return fileName;
-  }
-
-  private String stripFileName(String fileName) {
-    return fileName.substring(0, fileName.length() - 4);
-  }
-
   /**
-   * Determines if the uploaded file is eligible for signing
+   * Determines if the uploaded file is a valid document
    *
-   * @param bytes bytes of the file to sign
-   * @return true if the uploaded file is eligible for signing
+   * @param bytes bytes of the file
+   * @throws IOException on errors parsing the uploaded document
    */
-  private void checkFileValidity(byte[] bytes) throws RuntimeException {
+  private void checkFileValidity(byte[] bytes) throws IOException {
 
     DocType docType = DocType.getDocType(bytes);
     switch (docType) {
     case XML:
+      checkXmlFileValidity(bytes);
       //No further checks on xml
       break;
     case PDF:
@@ -196,15 +105,24 @@ public class UploadController {
     }
   }
 
-  private void checkPdfFileValidity(byte[] bytes) throws RuntimeException {
+  private void checkXmlFileValidity(byte[] bytes) throws IOException{
+    try {
+      XMLDocumentBuilder.getDocument(bytes);
+    } catch (Exception ex) {
+      log.warn("Error processing the uploaded XML document");
+      throw new IOException("Error parsing uploaded XML document (" + ex.getMessage() + ").");
+    }
+  }
+
+  private void checkPdfFileValidity(byte[] bytes) throws IOException {
     try {
       PDDocument document = PDDocument.load(bytes);
       // We are not modifying the document, so we close it directly to avoid memory leak
       document.close();
     }
-    catch (Exception e) {
+    catch (Exception ex) {
       log.warn("Error processing the uploaded PDF document");
-      throw new IllegalArgumentException("Fel vid utvärdering av tidigare underskivet dokument (" + e.getMessage() + ").");
+      throw new IOException("Error parsing uploaded PDF document (" + ex.getMessage() + ").");
     }
   }
 

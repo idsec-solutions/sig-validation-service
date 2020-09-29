@@ -44,6 +44,7 @@ public class MainController {
     httpSession.removeAttribute(SessionAttr.validationResult.name());
     httpSession.removeAttribute(SessionAttr.resultPageData.name());
     httpSession.removeAttribute(SessionAttr.uploadErrorMessage.name());
+    httpSession.removeAttribute(SessionAttr.svtDocument.name());
 
     // Set view model
     model.addAttribute("htmlTitle", htmlTitleUpload);
@@ -58,10 +59,6 @@ public class MainController {
     return "sigval";
   }
 
-  @RequestMapping("/home")
-  public String langSelect(){
-    return "redirect:/";
-  }
 
 
 

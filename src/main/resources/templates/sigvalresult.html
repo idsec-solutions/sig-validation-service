@@ -53,10 +53,10 @@
                     class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
                     onclick="$('#metadataViewDiv').fadeIn(700)"
                     th:text="${text.getString('showDoc')}"></button>&nbsp;&nbsp;&nbsp;
-            <button th:if="${resultPageData.getStatus().name().equalsIgnoreCase('ok')}"
+            <button th:if="${resultPageData.getStatus().name().equalsIgnoreCase('ok') && svtAvailable}"
                     class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
-                    th:onclick="'downloadSvt(' + ${docType.equals(T(se.idsec.sigval.commons.document.DocType).XML) ? 0 : 1} + ')'"
-                    >Create SVT document</button>&nbsp;&nbsp;&nbsp;
+                    th:onclick="'downloadSvt()'"
+                    th:text="${text.getString('getSvt')}"></button>&nbsp;&nbsp;&nbsp;
 
             <table class="table table-sm table-borderless" style="margin-top: 20px">
                 <tr>
@@ -125,12 +125,18 @@
                             </th:block>
                         </tr>
                         <tr>
-                            <td class="sig-res-param">Validation type</td>
-                            <td th:text="${sigData.isSvt() ? 'Signature Validation Token' : 'Signature Validation'}"></td>
+                            <td class="sig-res-param" th:text="${text.getString('validationType')}"></td>
+                            <td th:text="${sigData.isSvt() ? text.getString('svt') : text.getString('signatureValidation')}"></td>
                         </tr>
                         <tr>
                             <td class="sig-res-param" th:text="${text.getString('coversDoc')}"></td>
-                            <td th:text="${sigData.isCoversAllData() ? text.getString('coverAll') : text.getString('coverSome')}"></td>
+                            <td>
+                                <span th:text="${sigData.isCoversAllData() ? text.getString('coverAll') : text.getString('coverSome')}"></span>
+                                &nbsp;
+                                <button class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
+                                        th:onclick="'$(\'#sigDataDiv-' + ${sigDataStat.count} +'\').fadeIn(700);'"
+                                        th:text="${text.getString('showSignedContent')}"></button>
+                            </td>
                         </tr>
                         <th:block th:if="${sigData.getIdp() != null}">
                             <tr>
@@ -192,13 +198,40 @@
             <div id="metadataDisplayDiv">
                 <th:block th:switch="${docType}">
                     <pre th:case="${T(se.idsec.sigval.commons.document.DocType).XML}"><code th:text="${xmlPrettyPrint}"></code></pre>
-                    <embed th:case="${T(se.idsec.sigval.commons.document.DocType).PDF}" id='pdfFrame' src='inlinepdf?target=signed' type='application/pdf' style='width: 100%'>
+                    <embed th:case="${T(se.idsec.sigval.commons.document.DocType).PDF}" id='pdfFrame' src='inlinepdf' type='application/pdf' style='width: 100%'>
                 </th:block>
             </div>
         </div>
     </div>
 </div>
-
+<!-- Signed content display box -->
+<th:block th:each="sigData, sigDataStat: ${signedDocs}">
+    <!-- Signed document display box -->
+    <div th:id="'sigDataDiv-'+${sigDataStat.count}" class="confirm-bgr">
+        <div class="card metadata-panel">
+            <div th:id="'sigDataTitleDiv-'+${sigDataStat.count}" class="card-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td th:id="'sigDataTitleCell-'+${sigDataStat.count}">
+                            <h5 th:text="${text.getString('contentSignedBySignature')} + ' ' + ${sigDataStat.count}"></h5>
+                        </td>
+                        <td style="text-align: right">
+                            <button class="btn btn-sm btn-primary" style="margin-top: 10px" th:onclick="'$(\'#sigDataDiv-' + ${sigDataStat.count} +'\').fadeOut(700);'" th:text="${text.getString('close')}"></button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div th:id="'sigDataBodyDiv-'+${sigDataStat.count}" class="card-body">
+                <div th:id="'sigDataDisplayDiv-'+${sigDataStat.count}">
+                    <th:block th:switch="${docType}">
+                        <pre th:case="${T(se.idsec.sigval.commons.document.DocType).XML}"><code th:text="${sigData}"></code></pre>
+                        <embed th:case="${T(se.idsec.sigval.commons.document.DocType).PDF}" th:id="'pdfFrame-'+${sigDataStat.count}" th:src="${sigData}" type="application/pdf" style="width: 100%">
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
 
 </body>
 </html>
