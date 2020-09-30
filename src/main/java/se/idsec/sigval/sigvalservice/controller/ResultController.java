@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 import org.xml.sax.SAXException;
 import se.idsec.sigval.commons.data.ExtendedSigValResult;
 import se.idsec.sigval.commons.data.SignedDocumentValidationResult;
 import se.idsec.sigval.commons.document.DocType;
-import se.idsec.sigval.sigvalservice.configuration.FileSize;
+import se.idsec.sigval.sigvalservice.configuration.ui.BasicUiModel;
 import se.idsec.sigval.sigvalservice.configuration.ui.LogoImages;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIStyle;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIText;
@@ -23,29 +25,26 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
 public class ResultController {
 
-  @Value("${sigval-service.ui.html-title.result}") String htmlTitleResult;
-  @Value("${sigval-service.ui.style}") String style;
-  @Value("${sigval-service.ui.devmode}") boolean devmode;
   @Value("${sigval-service.ui.issue-svt-if-svt-exist}") boolean issueSvtIfExists;
   @Value("${sigval-service.ui.enalbe-signed-data-view}") boolean enableSignedDataView;
   @Value("${sigval-service.ui.show-loa}") boolean showLoa;
+  @Value("${sigval-service.svt.issuer-enabled}") boolean enableSvtIssuer;
 
   private final UIText uiText;
   private final HttpSession httpSession;
-  private final LogoImages logoImages;
   private final ResultPageDataGenerator resultPageDataGenerator;
+  private final BasicUiModel basicUiModel;
 
 
-  public ResultController(UIText uiText, HttpSession httpSession, LogoImages logoImages, ResultPageDataGenerator resultPageDataGenerator) {
+  public ResultController(UIText uiText, HttpSession httpSession, BasicUiModel basicUiModel, ResultPageDataGenerator resultPageDataGenerator) {
     this.uiText = uiText;
     this.httpSession = httpSession;
-    this.logoImages = logoImages;
+    this.basicUiModel = basicUiModel;
     this.resultPageDataGenerator = resultPageDataGenerator;
   }
 
@@ -84,23 +83,26 @@ public class ResultController {
     boolean svtAvailable = signatureValidationResults.stream().anyMatch(sigValResult -> sigValResult.getSvtJWT() == null);
 
     // Set view model
-    model.addAttribute("bootstrapCss", UIStyle.valueOf(style).getBootrapSrc());
-    model.addAttribute("htmlTitle", htmlTitleResult);
+    model.addAttribute("basicModel", basicUiModel);
     model.addAttribute("resultPageData", resultPageData);
     model.addAttribute("validationResult", validationResult);
-    model.addAttribute("logoUrl", logoImages.getLogoUrl());
-    model.addAttribute("secondaryLogoUrl", logoImages.getSecondaryLogoUrl());
-    model.addAttribute("devmode", devmode);
     model.addAttribute("lang", lang);
     model.addAttribute("text", uiText.getBundle(UIText.UiBundle.resultText, lang));
     model.addAttribute("docType", docType);
     model.addAttribute("showLoa", showLoa);
     model.addAttribute("xmlPrettyPrint", xmlPrettyPrint);
     model.addAttribute("signedDocs", signedDocumentList);
-    model.addAttribute("svtAvailable", svtAvailable || issueSvtIfExists);
+    model.addAttribute("svtAvailable", (svtAvailable || issueSvtIfExists) && enableSvtIssuer);
     model.addAttribute("enableSignedDataView", enableSignedDataView);
 
     return "sigvalresult";
+  }
+
+  @ExceptionHandler(Exception.class)
+  public String handleException(Exception ex, Model model){
+    model.addAttribute("basicModel", basicUiModel);
+    model.addAttribute("message", ex.getMessage());
+    return "error";
   }
 
 

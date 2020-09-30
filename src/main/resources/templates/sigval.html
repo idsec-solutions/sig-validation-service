@@ -22,7 +22,7 @@
     <script src="js/upload.js"></script>
     <script src="js/lang.js"></script>
 
-    <link rel="stylesheet" th:href="${bootstrapCss}"/>
+    <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>
     <link rel="stylesheet" href="webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css"/>
     <link rel="stylesheet" href="webjars/bootstrap-fileinput/5.1.0/css/fileinput.min.css"/>
     <link rel="stylesheet" href="css/main.css"/>
@@ -34,16 +34,16 @@
         /*]]>*/
     </script>
 
-    <title th:text="${htmlTitle}"></title>
+    <title th:text="${basicModel.getHtmlTitle()}"></title>
 </head>
 <body>
 <div class="container">
     <div class="card" style="margin-top: 10px">
         <div class="card-header" style="text-align: center">
             <h2>
-                <img align="left" th:src="${logoUrl}" alt="Logo" height="50">
-                <span th:if="${devmode}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
-                <img th:if="${secondaryLogoUrl != null}" align='right' th:src="${secondaryLogoUrl}" alt='Logo' height='50' >
+                <img align="left" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
+                <span th:if="${basicModel.isDevmode()}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
+                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" align='right' th:src="${basicModel.getSecondaryLogoUrl()}" alt='Logo' height='50' >
             </h2>
         </div>
         <div class="card-body">

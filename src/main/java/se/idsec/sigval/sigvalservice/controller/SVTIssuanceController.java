@@ -1,19 +1,22 @@
 package se.idsec.sigval.sigvalservice.controller;
 
 import com.nimbusds.jwt.SignedJWT;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Document;
 import se.idsec.sigval.pdf.timestamp.issue.impl.PDFDocTimstampProcessor;
-import se.idsec.sigval.sigvalservice.configuration.FileSize;
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
+import se.idsec.sigval.sigvalservice.configuration.ui.BasicUiModel;
 import se.idsec.sigval.svt.issuer.SVTModel;
 import se.idsec.sigval.xml.svt.XMLDocumentSVTMethod;
 import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
@@ -23,22 +26,29 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @RestController
+@Slf4j
 public class SVTIssuanceController {
+
+  @Value("${sigval-service.svt.issuer-enabled}") boolean enableSvtIssuer;
 
   private final HttpSession httpSession;
   private final SignatureValidatorProvider signatureValidatorProvider;
   private final SVTModel svtModel;
+  private final BasicUiModel basicUiModel;
 
   @Autowired
   public SVTIssuanceController(HttpSession httpSession,
-    SignatureValidatorProvider signatureValidatorProvider, SVTModel svtModel) {
+    SignatureValidatorProvider signatureValidatorProvider, SVTModel svtModel, BasicUiModel basicUiModel) {
     this.httpSession = httpSession;
     this.signatureValidatorProvider = signatureValidatorProvider;
     this.svtModel = svtModel;
+    this.basicUiModel = basicUiModel;
   }
 
   @RequestMapping(value = "/pdfsvt", method = RequestMethod.GET, produces = "application/pdf")
-  public ResponseEntity<InputStreamResource> getPdfDocument() throws Exception {
+  public ResponseEntity<InputStreamResource> getPdfDocument() throws IOException, RuntimeException {
+
+    if (!enableSvtIssuer) throw new IllegalArgumentException("SVT issuer disabled - received SVT issuing request");
 
     byte[] svtDocBytes = (byte[]) httpSession.getAttribute(SessionAttr.svtDocument.name());
     String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
@@ -48,15 +58,17 @@ public class SVTIssuanceController {
       byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
       docName = getSvtFileName(docName.replaceAll("\\s*,\\s*", "-"), docType);
 
-      //TODO Issue PDF SVT
-      //svtDocBytes = Issue SVT from signedDoc;
-      SignedJWT signedSvtJWT = signatureValidatorProvider.getPdfsvtSigValClaimsIssuer().getSignedSvtJWT(signedDoc, svtModel);
-      PDFDocTimstampProcessor.Result result = PDFDocTimstampProcessor.createSVTSealedPDF(
-        signedDoc, signedSvtJWT.serialize(), signatureValidatorProvider.getSvtTsSigner());
+      try {
+        SignedJWT signedSvtJWT = signatureValidatorProvider.getPdfsvtSigValClaimsIssuer().getSignedSvtJWT(signedDoc, svtModel);
+        PDFDocTimstampProcessor.Result result = PDFDocTimstampProcessor.createSVTSealedPDF(
+          signedDoc, signedSvtJWT.serialize(), signatureValidatorProvider.getSvtTsSigner());
+        svtDocBytes = result.getDocument();
+        httpSession.setAttribute(SessionAttr.svtDocument.name(), svtDocBytes);
+      } catch (Exception ex){
+        log.error("Error issuing SVT token {}", ex.getMessage());
+        throw new IOException(ex.getMessage());
+      }
 
-      svtDocBytes = result.getDocument();
-
-      httpSession.setAttribute(SessionAttr.svtDocument.name(), svtDocBytes);
     }
 
     if (svtDocBytes == null || !docType.equalsIgnoreCase("application/pdf")) {
@@ -74,7 +86,8 @@ public class SVTIssuanceController {
 
   @RequestMapping(value = "/xmlsvt", method = RequestMethod.GET, produces = "text/xml")
   public ResponseEntity<InputStreamResource> getXmlDocument()
-    throws Exception {
+    throws IOException, RuntimeException {
+    if (!enableSvtIssuer) throw new IllegalArgumentException("SVT issuer disabled - received SVT issuing request");
 
     byte[] svtDocBytes = (byte[]) httpSession.getAttribute(SessionAttr.svtDocument.name());
     String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
@@ -84,9 +97,14 @@ public class SVTIssuanceController {
       byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
       docName = getSvtFileName(docName.replaceAll("\\s*,\\s*", "-"), docType);
 
-      Document document = XMLDocumentBuilder.getDocument(signedDoc);
-      svtDocBytes = signatureValidatorProvider.getXmlDocumentSVTIssuer().issueSvt(document, svtModel, XMLDocumentSVTMethod.EXTEND);
-      httpSession.setAttribute(SessionAttr.svtDocument.name(), svtDocBytes);
+      try {
+        Document document = XMLDocumentBuilder.getDocument(signedDoc);
+        svtDocBytes = signatureValidatorProvider.getXmlDocumentSVTIssuer().issueSvt(document, svtModel, XMLDocumentSVTMethod.EXTEND);
+        httpSession.setAttribute(SessionAttr.svtDocument.name(), svtDocBytes);
+      } catch (Exception ex){
+        log.error("Error issuing SVT token {}", ex.getMessage());
+        throw new IOException(ex.getMessage());
+      }
     }
 
     if (svtDocBytes == null || !docType.equalsIgnoreCase("text/xml")) {
@@ -99,6 +117,15 @@ public class SVTIssuanceController {
       .contentLength(svtDocBytes.length)
       .contentType(MediaType.parseMediaType("application/octet-stream"))
       .body(new InputStreamResource(new ByteArrayInputStream(svtDocBytes)));
+  }
+
+  @ExceptionHandler({IOException.class, RuntimeException.class})
+  public ModelAndView handleIOException(Exception ex){
+    ModelAndView mav = new ModelAndView();
+    mav.addObject("message", ex.getMessage());
+    mav.addObject("basicModel", basicUiModel);
+    mav.setViewName("error");
+    return mav;
   }
 
   private HttpHeaders getHeaders(String fileName) {

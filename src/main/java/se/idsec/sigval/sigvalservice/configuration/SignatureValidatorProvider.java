@@ -52,6 +52,7 @@ public class SignatureValidatorProvider {
 
   @Value("${sigval-service.svt.model.sig-algo}") String svtSigAlgo;
   @Value("${sigval-service.svt.timestamp.policy:#{null}}") String timestampPolicy;
+  @Value("${sigval-service.svt.validator-enabled}") boolean enableSvtValidation;
 
   @Getter private DefaultPDFDocTimestampSignatureInterface svtTsSigner;
   @Getter private PDFSVTSigValClaimsIssuer pdfsvtSigValClaimsIssuer;
@@ -112,7 +113,10 @@ public class SignatureValidatorProvider {
     PDFSVTValidator pdfsvtValidator = new PDFSVTValidator(certValidators.getSvtCertificateValidator(), timeStampPolicyVerifier);
 
     // Get the pdf validator
-    return new SVTenabledPDFDocumentSigVerifier(pdfSignatureVerifier, pdfsvtValidator, new DefaultPDFSignatureContextFactory());
+    return new SVTenabledPDFDocumentSigVerifier(
+      pdfSignatureVerifier,
+      enableSvtValidation ? pdfsvtValidator : null,
+      new DefaultPDFSignatureContextFactory());
   }
 
 
@@ -152,8 +156,10 @@ public class SignatureValidatorProvider {
     XMLSignaturePolicyValidator xmlSignaturePolicyValidator = new PkixXmlSignaturePolicyValidator();
 
     return new XMLSignatureElementValidatorImpl(
-      certValidators.getSignatureCertificateValidator(), xmlSignaturePolicyValidator, timeStampPolicyVerifier,
-      new XMLSVTValidator(certValidators.getSvtCertificateValidator(), certValidators.getKidMatchCerts())
+      certValidators.getSignatureCertificateValidator(),
+      xmlSignaturePolicyValidator,
+      timeStampPolicyVerifier,
+      enableSvtValidation ? new XMLSVTValidator(certValidators.getSvtCertificateValidator(), certValidators.getKidMatchCerts()) : null
     );
   }
 

@@ -5,10 +5,12 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 import se.idsec.sigval.commons.data.ExtendedSigValResult;
 import se.idsec.sigval.commons.data.SignedDocumentValidationResult;
 import se.idsec.sigval.commons.document.DocType;
 import se.idsec.sigval.sigvalservice.configuration.FileSize;
+import se.idsec.sigval.sigvalservice.configuration.ui.BasicUiModel;
 import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
 
 import javax.servlet.http.HttpSession;
@@ -38,16 +40,9 @@ public class UploadController {
     }
 
     byte[] signedDoc = file.getBytes();
-    String uploadErrorMessage = null;
-    try {
-      checkFileValidity(file.getBytes());
-    }
-    catch (Exception ex) {
-      uploadErrorMessage = ex.getMessage();
-    }
+    checkFileValidity(file.getBytes());
 
     httpSession.setAttribute(SessionAttr.signedDoc.name(), signedDoc);
-    httpSession.setAttribute(SessionAttr.uploadErrorMessage.name(), uploadErrorMessage);
     httpSession.setAttribute(SessionAttr.docMimeType.name(), file.getContentType());
     httpSession.setAttribute(SessionAttr.docName.name(), file.getOriginalFilename());
     return "[]";
@@ -80,6 +75,11 @@ public class UploadController {
       throw new IOException("Target PDF file is not available");
     }
     return docBytes;
+  }
+
+  @ExceptionHandler({IOException.class, RuntimeException.class})
+  public String handleIOException(Exception ex){
+    return "{\"message\": \""+ex.getMessage()+"\"}";
   }
 
   /**

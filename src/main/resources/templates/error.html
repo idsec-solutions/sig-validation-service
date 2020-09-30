@@ -18,21 +18,21 @@
     <script src="webjars/bootstrap-select/1.13.17/js/i18n/defaults-sv_SE.min.js"></script>
     <script src="webjars/jquery-cookie/1.4.1-1/jquery.cookie.js"></script>
 
-    <link rel="stylesheet" th:href="${bootstrapCss}"/>
+    <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>
     <link rel="stylesheet" href="webjars/font-awesome/5.13.0/css/all.min.css"/>
     <link rel="stylesheet" href="webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css"/>
     <link rel="stylesheet" href="webjars/highlightjs/9.15.10/styles/atom-one-light.css"/>
 
-    <title th:text="${htmlTitle}"></title>
+    <title th:text="${basicModel.getHtmlTitleError()}"></title>
 </head>
 <body>
 <div class="container">
     <div class="card" style="margin-top: 10px">
         <div class="card-header" style="text-align: center">
             <h2>
-                <img align="left" th:src="${logoUrl}" alt="Logo" height="50">
-                <span th:if="${devmode}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
-                <img th:if="${secondaryLogoUrl != null}" align='right' th:src="${secondaryLogoUrl}" alt='Logo' height='50'>
+                <img align="left" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
+                <span th:if="${basicModel.isDevmode()}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
+                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" align='right' th:src="${basicModel.getSecondaryLogoUrl()}" alt='Logo' height='50'>
             </h2>
         </div>
         <div class="card-body">
