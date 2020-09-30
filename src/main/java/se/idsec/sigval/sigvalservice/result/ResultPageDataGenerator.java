@@ -107,6 +107,7 @@ public class ResultPageDataGenerator {
     builder.coversAllData(signatureValResult.isCoversDocument());
     builder.svt(signatureValResult.getSvtJWT() != null);
     builder.signedDataAvailable(signatureValResult.getSignedDocument() != null);
+    if (signatureValResult.getException() != null) builder.errorMessage(signatureValResult.getException().getMessage());
     SignatureValidationResult.Status status = signatureValResult.getStatus();
     switch (status) {
 

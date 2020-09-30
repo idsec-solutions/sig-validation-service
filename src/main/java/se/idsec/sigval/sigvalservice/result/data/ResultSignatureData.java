@@ -15,6 +15,7 @@ import java.util.List;
 public class ResultSignatureData {
 
   private SigValidStatus status;
+  private String errorMessage;
   private boolean coversAllData;
   private boolean svt;
   private boolean signedDataAvailable;

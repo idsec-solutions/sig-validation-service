@@ -124,6 +124,10 @@
                                 </td>
                             </th:block>
                         </tr>
+                        <tr th:if="${!sigData.getStatus().equals(T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok) && sigData.getErrorMessage() != null}" >
+                            <td class="sig-res-param" th:text="${text.getString('reason')}"></td>
+                            <td th:text="${sigData.getErrorMessage()}"></td>
+                        </tr>
                         <tr>
                             <td class="sig-res-param" th:text="${text.getString('validationType')}"></td>
                             <td th:text="${sigData.isSvt() ? text.getString('svt') : text.getString('signatureValidation')}"></td>
