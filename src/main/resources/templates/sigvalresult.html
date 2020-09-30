@@ -48,17 +48,13 @@
                    th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected':''}">sv</a>
             </div>
             <h4 th:text="${text.getString('title1')}"></h4>
-            <span th:text="${text.getString('document')}"></span><b th:text="${resultPageData.getDocumentName()}"></b>&nbsp;&nbsp;
+            <span th:text="${text.getString('document')}"></span>&nbsp;<b th:text="${resultPageData.getDocumentName()}"></b>&nbsp;&nbsp;
             <button th:if="${resultPageData.getDocumentType() != null}"
                     class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
                     onclick="$('#sigDataDiv').fadeIn(700)"
-                    th:text="${text.getString('showDoc')}"></button>&nbsp;&nbsp;&nbsp;
-            <button th:if="${resultPageData.getStatus().name().equalsIgnoreCase('ok') && svtAvailable}"
-                    class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
-                    th:onclick="'downloadSvt()'"
-                    th:text="${text.getString('getSvt')}"></button>&nbsp;&nbsp;&nbsp;
+                    th:text="${text.getString('showDoc')}"></button>
 
-            <table class="table table-sm table-borderless" style="margin-top: 20px">
+            <table class="table table-sm table-borderless" style="margin-top: 20px; margin-bottom: 5px">
                 <tr>
                     <td class="overall-param" th:text="${text.getString('status')}"></td>
                     <th:block th:switch="${resultPageData.getStatus()}">
@@ -98,6 +94,10 @@
                 </tr>
                 -->
             </table>
+            <button th:if="${resultPageData.getStatus().name().equalsIgnoreCase('ok') && svtAvailable}"
+                    class="btn btn-sm btn-outline-dark" style="height: 25px; padding-top: 1px; padding-bottom: 1px; margin-bottom: 10px"
+                    th:onclick="'downloadSvt()'"
+                    th:text="${text.getString('getSvt')}"></button>&nbsp;&nbsp;&nbsp;
 
             <!-- Display each signature -->
             <th:block th:each="sigData, sigDataStat : ${resultPageData.getResultSignatureDataList()}">
@@ -133,7 +133,7 @@
                             <td>
                                 <span th:text="${sigData.isCoversAllData() ? text.getString('coverAll') : text.getString('coverSome')}"></span>
                                 &nbsp;
-                                <button th:if="${enableSignedDataView && sigData.isSignedDataAvailable()}"
+                                <button th:if="${enableSignedDataView && sigData.isSignedDataAvailable() && !sigData.isCoversAllData()}"
                                         class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
                                         th:onclick="'$(\'#sigDataDiv-' + ${sigDataStat.count} +'\').fadeIn(700);'"
                                         th:text="${text.getString('showSignedContent')}"></button>
