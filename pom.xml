@@ -10,7 +10,7 @@
     </parent>
     <groupId>se.idsec.sigval</groupId>
     <artifactId>sigval-service</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>sigval-service</name>
     <description>Demo project for Spring Boot</description>
 

@@ -5,17 +5,14 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 import se.idsec.sigval.commons.data.ExtendedSigValResult;
 import se.idsec.sigval.commons.data.SignedDocumentValidationResult;
 import se.idsec.sigval.commons.document.DocType;
 import se.idsec.sigval.sigvalservice.configuration.FileSize;
-import se.idsec.sigval.sigvalservice.configuration.ui.BasicUiModel;
 import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
 @Log4j2
 @RestController

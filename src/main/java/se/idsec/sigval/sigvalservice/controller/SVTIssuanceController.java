@@ -30,6 +30,9 @@ import java.io.IOException;
 public class SVTIssuanceController {
 
   @Value("${sigval-service.svt.issuer-enabled}") boolean enableSvtIssuer;
+  @Value("${sigval-service.ui.display-downloaded-svt-pdf}") boolean displayPdf;
+  @Value("${sigval-service.ui.display-downloaded-svt-xml}") boolean displayXml;
+  @Value("${sigval-service.ui.downloaded-svt-suffix}") String svtSuffix;
 
   private final HttpSession httpSession;
   private final SignatureValidatorProvider signatureValidatorProvider;
@@ -79,7 +82,7 @@ public class SVTIssuanceController {
       .ok()
       .headers(getHeaders(docName))
       .contentLength(svtDocBytes.length)
-      .contentType(MediaType.parseMediaType("application/octet-stream"))
+      .contentType(MediaType.parseMediaType(displayPdf ? "application/pdf" : "application/octet-stream"))
       .body(new InputStreamResource(new ByteArrayInputStream(svtDocBytes)));
   }
 
@@ -115,7 +118,7 @@ public class SVTIssuanceController {
       .ok()
       .headers(getHeaders(docName))
       .contentLength(svtDocBytes.length)
-      .contentType(MediaType.parseMediaType("application/octet-stream"))
+      .contentType(MediaType.parseMediaType(displayXml ? "text/xml" : "application/octet-stream"))
       .body(new InputStreamResource(new ByteArrayInputStream(svtDocBytes)));
   }
 
@@ -131,7 +134,7 @@ public class SVTIssuanceController {
   private HttpHeaders getHeaders(String fileName) {
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-    headers.add("content-disposition", "inline; filename=" + fileName);
+    headers.add("Content-disposition", "inline; filename=" + fileName);
     headers.add("Pragma", "no-cache");
     headers.add("Expires", "0");
     return headers;
@@ -140,10 +143,10 @@ public class SVTIssuanceController {
   private String getSvtFileName(String fileName, String tbsType) {
 
     if (fileName.toLowerCase().endsWith(".xml") && tbsType.equalsIgnoreCase("text/xml")) {
-      return stripFileName(fileName) + "_svt.xml";
+      return stripFileName(fileName) + svtSuffix +".xml";
     }
     if (fileName.toLowerCase().endsWith(".pdf") && tbsType.equalsIgnoreCase("application/pdf")) {
-      return stripFileName(fileName) + "_svt.pdf";
+      return stripFileName(fileName) + svtSuffix +".pdf";
     }
     return fileName;
   }
