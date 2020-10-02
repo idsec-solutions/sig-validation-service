@@ -113,6 +113,7 @@ public class ResultPageDataGenerator {
 
     case SUCCESS:
       builder.status(SigValidStatus.ok);
+      builder.validationDateLimit(getValidationDateLimit(signatureValResult));
       break;
     case INTERDETERMINE:
       builder.status(SigValidStatus.incomplete);
@@ -139,6 +140,44 @@ public class ResultPageDataGenerator {
       return getPdfSigResult(
         (ExtendedPdfSigValResult) signatureValResult, builder.build());
     return builder.build();
+  }
+
+  private String getValidationDateLimit(ExtendedSigValResult signatureValResult) {
+    try {
+      if (signatureValResult.getSvtJWT() != null){
+        // This is SVT. Use the SVT expiry date if possible
+        if (signatureValResult.getSvtJWT().getJWTClaimsSet().getExpirationTime() != null){
+          return dateFormat.format(signatureValResult.getSvtJWT().getJWTClaimsSet().getExpirationTime());
+        } else {
+          return null;
+        }
+      }
+
+      // Not SVT. Examine cert expiry time
+      Date mostRecentExpiryDate = null;
+      boolean foundExpiryDate = false;
+      List<X509Certificate> validatedCertificatePath = signatureValResult.getCertificateValidationResult().getValidatedCertificatePath();
+      // We need at least 2 certs. If it is one, then trust is direct TA trust and expiry date does not matter.
+      if (validatedCertificatePath.size() < 2) return null;
+
+      for (int i = 0; i<validatedCertificatePath.size()-1 ; i++){
+        X509Certificate cert = validatedCertificatePath.get(i);
+        Date notAfter = cert.getNotAfter();
+        if (foundExpiryDate){
+          mostRecentExpiryDate = notAfter.before(mostRecentExpiryDate) ? notAfter : mostRecentExpiryDate;
+        } else {
+          mostRecentExpiryDate = notAfter;
+        }
+        foundExpiryDate = true;
+      }
+      if (foundExpiryDate) {
+        return dateFormat.format(mostRecentExpiryDate);
+      }
+
+    } catch (Exception ex){
+      log.warn("Error parsing expiry dates: {}", ex.getMessage());
+    }
+    return null;
   }
 
   private void addTimeStamptime(ExtendedSigValResult signatureValResult,

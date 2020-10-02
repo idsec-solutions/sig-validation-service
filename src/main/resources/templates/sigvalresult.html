@@ -132,6 +132,10 @@
                             <td class="sig-res-param" th:text="${text.getString('validationType')}"></td>
                             <td th:text="${sigData.isSvt() ? text.getString('svt') : text.getString('signatureValidation')}"></td>
                         </tr>
+                        <tr th:if="${sigData.getValidationDateLimit() != null || sigData.isSvt()}">
+                            <td class="sig-res-param" th:text="${text.getString('validationDateLimit')}"></td>
+                            <td th:text="${sigData.getValidationDateLimit() != null ? sigData.getValidationDateLimit() : text.getString('unlimited')}"></td>
+                        </tr>
                         <tr th:if="${sigData.getStatus().equals(T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok)}">
                             <td class="sig-res-param" th:text="${text.getString('coversDoc')}"></td>
                             <td>

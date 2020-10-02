@@ -19,6 +19,7 @@ public class ResultSignatureData {
   private boolean coversAllData;
   private boolean svt;
   private boolean signedDataAvailable;
+  private String validationDateLimit;
   private String idp;
   private String signingTime;
   private String loa;
