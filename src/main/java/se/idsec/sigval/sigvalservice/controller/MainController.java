@@ -47,7 +47,7 @@ public class MainController {
     model.addAttribute("basicModel", basicUiModel);
     model.addAttribute("lang", lang);
     model.addAttribute("text", uiText.getBundle(UIText.UiBundle.resultText, lang));
-    model.addAttribute("maxmaxFileSizeKb", maxFileSize.getKbValue());
+    model.addAttribute("maxFileSizeKb", maxFileSize.getKbValue());
 
     return "sigval";
   }
