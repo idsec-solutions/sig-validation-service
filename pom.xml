@@ -93,12 +93,12 @@
         <!-- IDsec sig val lib -->
         <dependency>
             <groupId>se.idsec.sigval.base</groupId>
-            <artifactId>sigval-xml</artifactId>
-            <version>1.0.0</version>
+            <artifactId>sigval-pdf</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>se.idsec.sigval.base</groupId>
-            <artifactId>sigval-pdf</artifactId>
+            <artifactId>sigval-xml</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>

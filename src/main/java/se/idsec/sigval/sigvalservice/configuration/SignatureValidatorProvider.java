@@ -53,6 +53,7 @@ public class SignatureValidatorProvider {
   @Value("${sigval-service.svt.model.sig-algo}") String svtSigAlgo;
   @Value("${sigval-service.svt.timestamp.policy:#{null}}") String timestampPolicy;
   @Value("${sigval-service.svt.validator-enabled}") boolean enableSvtValidation;
+  @Value("${sigval-service.validator.strict-pdf-context}") boolean strictPdfContextFactory;
 
   @Getter private DefaultPDFDocTimestampSignatureInterface svtTsSigner;
   @Getter private PDFSVTSigValClaimsIssuer pdfsvtSigValClaimsIssuer;
@@ -112,11 +113,14 @@ public class SignatureValidatorProvider {
     // Setup SVA validator
     PDFSVTValidator pdfsvtValidator = new PDFSVTValidator(certValidators.getSvtCertificateValidator(), timeStampPolicyVerifier);
 
+    DefaultPDFSignatureContextFactory pdfContextFactory = new DefaultPDFSignatureContextFactory();
+    pdfContextFactory.setStrict(strictPdfContextFactory);
+
     // Get the pdf validator
     return new SVTenabledPDFDocumentSigVerifier(
       pdfSignatureVerifier,
       enableSvtValidation ? pdfsvtValidator : null,
-      new DefaultPDFSignatureContextFactory());
+      pdfContextFactory);
   }
 
 
