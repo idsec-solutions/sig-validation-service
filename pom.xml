@@ -10,7 +10,7 @@
     </parent>
     <groupId>se.idsec.sigval</groupId>
     <artifactId>sigval-service</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
     <name>sigval-service</name>
     <description>Demo project for Spring Boot</description>
 
@@ -94,12 +94,12 @@
         <dependency>
             <groupId>se.idsec.sigval.base</groupId>
             <artifactId>sigval-pdf</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>se.idsec.sigval.base</groupId>
             <artifactId>sigval-xml</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.opensaml</groupId>
