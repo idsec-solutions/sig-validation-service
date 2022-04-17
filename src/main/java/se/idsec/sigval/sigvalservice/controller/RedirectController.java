@@ -3,7 +3,7 @@ package se.idsec.sigval.sigvalservice.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import se.idsec.sigval.commons.document.DocType;
+import se.swedenconnect.sigval.commons.document.DocType;
 
 import javax.servlet.http.HttpSession;
 

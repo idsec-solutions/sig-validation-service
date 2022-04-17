@@ -8,7 +8,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.security.x509.X509Credential;
-import se.idsec.sigval.commons.utils.SVAUtils;
+import se.swedenconnect.sigval.commons.utils.SVAUtils;
 import se.swedenconnect.opensaml.pkcs11.PKCS11Provider;
 import se.swedenconnect.opensaml.pkcs11.credential.PKCS11Credential;
 import se.swedenconnect.opensaml.pkcs11.credential.PKCS11NoTestCredential;

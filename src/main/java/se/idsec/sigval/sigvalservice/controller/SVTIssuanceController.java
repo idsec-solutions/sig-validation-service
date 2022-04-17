@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Document;
-import se.idsec.sigval.pdf.timestamp.issue.impl.PDFDocTimstampProcessor;
+import se.swedenconnect.sigval.pdf.timestamp.issue.impl.PDFDocTimstampProcessor;
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 import se.idsec.sigval.sigvalservice.configuration.ui.BasicUiModel;
-import se.idsec.sigval.svt.issuer.SVTModel;
-import se.idsec.sigval.xml.svt.XMLDocumentSVTMethod;
-import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
+import se.swedenconnect.sigval.svt.issuer.SVTModel;
+import se.swedenconnect.sigval.xml.svt.XMLDocumentSVTMethod;
+import se.swedenconnect.sigval.xml.utils.XMLDocumentBuilder;
 
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;

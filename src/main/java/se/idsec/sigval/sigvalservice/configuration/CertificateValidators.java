@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import se.idsec.signservice.security.certificate.CertificateValidator;
-import se.idsec.sigval.cert.chain.impl.StatusCheckingCertificateValidatorImpl;
-import se.idsec.sigval.cert.validity.crl.CRLCache;
-import se.idsec.sigval.commons.utils.SVAUtils;
+import se.swedenconnect.sigval.cert.chain.impl.StatusCheckingCertificateValidatorImpl;
+import se.swedenconnect.sigval.cert.validity.crl.CRLCache;
+import se.swedenconnect.sigval.commons.utils.SVAUtils;
 import se.idsec.sigval.sigvalservice.configuration.keys.TslTrustCertStoreFactory;
 
 import java.io.*;

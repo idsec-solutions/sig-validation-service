@@ -10,10 +10,10 @@ import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.GeneralName;
-import se.idsec.sigval.cert.utils.CertUtils;
-import se.idsec.sigval.commons.utils.SVAUtils;
-import se.idsec.x509cert.extensions.SubjectInformationAccess;
-import se.idsec.x509cert.extensions.data.OidName;
+import se.swedenconnect.sigval.cert.utils.CertUtils;
+import se.swedenconnect.sigval.commons.utils.SVAUtils;
+import se.swedenconnect.cert.extensions.SubjectInformationAccess;
+import se.swedenconnect.cert.extensions.data.OidName;
 
 import java.io.*;
 import java.net.URL;
