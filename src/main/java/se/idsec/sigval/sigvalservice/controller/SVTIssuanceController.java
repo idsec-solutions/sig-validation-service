@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2022. IDsec Solutions AB
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package se.idsec.sigval.sigvalservice.controller;
 
 import com.nimbusds.jwt.SignedJWT;
@@ -133,119 +149,6 @@ public class SVTIssuanceController {
       .contentType(mediaType)
       .body(new InputStreamResource(new ByteArrayInputStream(svtEnhancedDocument)));
   }
-
-/*  @RequestMapping(value = "/pdfsvt", method = RequestMethod.GET, produces = "application/pdf")
-  public ResponseEntity<InputStreamResource> getPdfDocument() throws IOException, RuntimeException {
-
-    if (!enableSvtIssuer)
-      throw new IllegalArgumentException("SVT issuer disabled - received SVT issuing request");
-
-    byte[] svtDocBytes = (byte[]) httpSession.getAttribute(SessionAttr.svtDocument.name());
-    String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
-    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
-
-    if (svtDocBytes == null) {
-      byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-      docName = getSvtFileName(docName.replaceAll("\\s*,\\s*", "-"), docType);
-
-      try {
-        SignedJWT signedSvtJWT = signatureValidatorProvider.getPdfsvtSigValClaimsIssuer().getSignedSvtJWT(signedDoc, svtModel);
-        PDFDocTimstampProcessor.Result result = PDFDocTimstampProcessor.createSVTSealedPDF(
-          signedDoc, signedSvtJWT.serialize(), signatureValidatorProvider.getSvtTsSigner());
-        svtDocBytes = result.getDocument();
-        httpSession.setAttribute(SessionAttr.svtDocument.name(), svtDocBytes);
-      }
-      catch (Exception ex) {
-        log.error("Error issuing SVT token {}", ex.getMessage());
-        throw new IOException(ex.getMessage());
-      }
-
-    }
-
-    if (svtDocBytes == null || !docType.equalsIgnoreCase("application/pdf")) {
-      throw new IllegalArgumentException("No PDF file is uploaded");
-    }
-
-    return ResponseEntity
-      .ok()
-      .headers(getHeaders(docName))
-      .contentLength(svtDocBytes.length)
-      .contentType(MediaType.parseMediaType(displayPdf ? "application/pdf" : "application/octet-stream"))
-      .body(new InputStreamResource(new ByteArrayInputStream(svtDocBytes)));
-  }
-
-  @RequestMapping(value = "/xmlsvt", method = RequestMethod.GET, produces = "text/xml")
-  public ResponseEntity<InputStreamResource> getXmlDocument()
-    throws IOException, RuntimeException {
-    if (!enableSvtIssuer)
-      throw new IllegalArgumentException("SVT issuer disabled - received SVT issuing request");
-
-    byte[] svtDocBytes = (byte[]) httpSession.getAttribute(SessionAttr.svtDocument.name());
-    String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
-    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
-
-    if (svtDocBytes == null) {
-      byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-      docName = getSvtFileName(docName.replaceAll("\\s*,\\s*", "-"), docType);
-
-      try {
-        Document document = XMLDocumentBuilder.getDocument(signedDoc);
-        svtDocBytes = signatureValidatorProvider.getXmlDocumentSVTIssuer().issueSvt(document, svtModel, XMLDocumentSVTMethod.EXTEND);
-        httpSession.setAttribute(SessionAttr.svtDocument.name(), svtDocBytes);
-      }
-      catch (Exception ex) {
-        log.error("Error issuing SVT token {}", ex.getMessage());
-        throw new IOException(ex.getMessage());
-      }
-    }
-
-    if (svtDocBytes == null || !docType.equalsIgnoreCase("text/xml")) {
-      throw new IOException("No XML file is uploaded");
-    }
-
-    return ResponseEntity
-      .ok()
-      .headers(getHeaders(docName))
-      .contentLength(svtDocBytes.length)
-      .contentType(MediaType.parseMediaType(displayXml ? "text/xml" : "application/octet-stream"))
-      .body(new InputStreamResource(new ByteArrayInputStream(svtDocBytes)));
-  }
-
-  @RequestMapping(value = "/josesvt", method = RequestMethod.GET, produces = "application/json")
-  public ResponseEntity<InputStreamResource> getJoseDocument()
-    throws IOException, RuntimeException {
-    if (!enableSvtIssuer)
-      throw new IllegalArgumentException("SVT issuer disabled - received SVT issuing request");
-
-    byte[] svtDocBytes = (byte[]) httpSession.getAttribute(SessionAttr.svtDocument.name());
-    String docType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
-    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
-
-    if (svtDocBytes == null) {
-      byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
-      docName = getSvtFileName(docName.replaceAll("\\s*,\\s*", "-"), docType);
-
-      try {
-        svtDocBytes = signatureValidatorProvider.getJoseDocumentSVTIssuer().issueSvt(signedDoc, svtModel, SVTExtendpolicy.EXTEND);
-        httpSession.setAttribute(SessionAttr.svtDocument.name(), svtDocBytes);
-      }
-      catch (Exception ex) {
-        log.error("Error issuing SVT token {}", ex.getMessage());
-        throw new IOException(ex.getMessage());
-      }
-    }
-
-    if (svtDocBytes == null) {
-      throw new IOException("No JOSE file is uploaded");
-    }
-
-    return ResponseEntity
-      .ok()
-      .headers(getHeaders(docName))
-      .contentLength(svtDocBytes.length)
-      .contentType(MediaType.parseMediaType(displayJson ? "application/json" : "application/octet-stream"))
-      .body(new InputStreamResource(new ByteArrayInputStream(svtDocBytes)));
-  }*/
 
   private HttpHeaders getHeaders(String fileName) {
     HttpHeaders headers = new HttpHeaders();
