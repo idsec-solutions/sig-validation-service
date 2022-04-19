@@ -26,7 +26,7 @@ $(document).ready(function () {
 });
 
 function downloadSvt(){
-    let win = window.open("issue-svt", "_blank");
+    let win = window.open("svt-request-form", "_blank");
     win.focus()
 }
 
@@ -49,5 +49,9 @@ function getValidationReport(){
 
     $("#sigreportoptions-dialogue").dialog("close");
 
-    window.location="report-request-form?certpath=" + includeChain + "&include-docs=" + includeSigDocs;
+    window.open("report-request-form?certpath=" + includeChain + "&include-docs=" + includeSigDocs, "_blank");
+}
+
+function directReportRequest() {
+    window.open("report-request-form", "_blank");
 }

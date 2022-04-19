@@ -71,9 +71,10 @@
                             <i class='fas fa-exclamation-triangle icon-warning'></i>&nbsp;<span th:text="${text.getString('someinvalid')}"></span>
                         </td>
                     </th:block>
-                    <td style="text-align: right">            <button class="btn btn-sm btn-outline-dark" style="height: 25px; padding-top: 1px; padding-bottom: 1px;"
-                                            onclick="openReportDialogue()"
-                                            th:text="${text.getString('validationReport')}"></button>
+                    <td style="text-align: right">
+                        <button class="btn btn-sm btn-outline-dark" style="height: 25px; padding-top: 1px; padding-bottom: 1px;"
+                            th:onclick="${showReportOptions} ? 'openReportDialogue()' : 'directReportRequest()'"
+                            th:text="${text.getString('validationReport')}"></button>
                     </td>
                 </tr>
                 <tr>
@@ -212,7 +213,9 @@
         <div class="card-body">
             <div id="sigDataDisplayDiv">
                 <th:block th:switch="${docType}">
-                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).XML}"><code th:text="${xmlPrettyPrint}"></code></pre>
+                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).XML}" style="white-space: pre-wrap;"><code th:text="${xmlPrettyPrint}"></code></pre>
+                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).JOSE}" style="white-space: pre-wrap;"><code th:text="${josePrettyPrint}"></code></pre>
+                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).JOSE_COMPACT}" style="white-space: pre-wrap;"><code th:text="${joseCompact}"></code></pre>
                     <embed th:case="${T(se.swedenconnect.sigval.commons.document.DocType).PDF}" id='pdfFrame' src='inlinepdf' type='application/pdf' style='width: 100%'>
                 </th:block>
             </div>

@@ -1,5 +1,6 @@
 package se.idsec.sigval.sigvalservice.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import se.swedenconnect.sigval.xml.utils.XMLDocumentBuilder;
 import javax.servlet.http.HttpSession;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +32,13 @@ import java.util.List;
 @Controller
 public class ResultController {
 
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
   @Value("${sigval-service.ui.issue-svt-if-svt-exist}") boolean issueSvtIfExists;
   @Value("${sigval-service.ui.enalbe-signed-data-view}") boolean enableSignedDataView;
   @Value("${sigval-service.ui.show-loa}") boolean showLoa;
   @Value("${sigval-service.svt.issuer-enabled}") boolean enableSvtIssuer;
+  @Value("${sigval-service.ui.show-report-options}") boolean showReportOptions;
 
   private final UIText uiText;
   private final HttpSession httpSession;
@@ -64,6 +69,10 @@ public class ResultController {
 
     String xmlPrettyPrint = docType.equals(DocType.XML) ? XMLDocumentBuilder.getDocText(XMLDocumentBuilder.getDocument(signedDoc)) : null;
 
+    String jsonPrettyPrint = getJsonPrettyPrint(docType, signedDoc);
+    String joseCompact = docType.equals(DocType.JOSE_COMPACT) ? new String(signedDoc, StandardCharsets.UTF_8) : null;
+
+
     List<? extends ExtendedSigValResult> signatureValidationResults = validationResult.getSignatureValidationResults();
     List<String> signedDocumentList = new ArrayList<>();
     for (int i=0; i<signatureValidationResults.size(); i++){
@@ -91,11 +100,26 @@ public class ResultController {
     model.addAttribute("docType", docType);
     model.addAttribute("showLoa", showLoa);
     model.addAttribute("xmlPrettyPrint", xmlPrettyPrint);
+    model.addAttribute("josePrettyPrint", jsonPrettyPrint);
+    model.addAttribute("joseCompact", joseCompact);
     model.addAttribute("signedDocs", signedDocumentList);
     model.addAttribute("svtAvailable", (svtAvailable || issueSvtIfExists) && enableSvtIssuer);
     model.addAttribute("enableSignedDataView", enableSignedDataView);
+    model.addAttribute("showReportOptions", showReportOptions);
 
     return "sigvalresult";
+  }
+
+  private String getJsonPrettyPrint(DocType docType, byte[] signedDocument) {
+    if (docType.equals(DocType.JOSE)){
+      try {
+        Object sigDocObj = OBJECT_MAPPER.readValue(signedDocument, Object.class);
+        return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(sigDocObj);
+      } catch (Exception ex) {
+        log.debug("Document believed to be a JSON signed document does not contain valid JSON");
+      }
+    }
+    return null;
   }
 
   @ExceptionHandler(Exception.class)

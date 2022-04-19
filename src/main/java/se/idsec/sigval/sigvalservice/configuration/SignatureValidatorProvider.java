@@ -106,9 +106,9 @@ public class SignatureValidatorProvider {
     xmlDocumentSVTIssuer = xmlDocumentSVTIssuer();
     pdfSignatureValidator = pdfSignatureValidator();
     pdfsvtSigValClaimsIssuer = pdfsvtSigValClaimsIssuer();
-    joseDocumentSVTIssuer = joseDocumentSVTIssuer();
     joseSignatureDataValidator = joseSignatureDataValidator();
     joseSignedDocumentValidator = joseSignedDocumentValidator();
+    joseDocumentSVTIssuer = joseDocumentSVTIssuer();
     pdfSigValReportGenerator = pdfSigValReportGenerator();
     xmlSigValReportGenerator = xmlSigValReportGenerator();
     joseSigValReportGenerator = joseSigValReportGenerator();

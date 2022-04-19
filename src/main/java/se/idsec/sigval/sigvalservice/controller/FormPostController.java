@@ -50,7 +50,6 @@ public class FormPostController {
     if (includeDocs != null) {
       formParameterList.add(new FormParameter("include-docs",includeDocs));
     }
-    formParameterList.add(new FormParameter("id", new BigInteger(128, RNG).toString(16)));
 
     model.addAttribute("targetUrl", "report");
     model.addAttribute("dataObjectName","document");
@@ -60,6 +59,33 @@ public class FormPostController {
     return "post-form";
 
   }
+
+  @RequestMapping("/svt-request-form")
+  public String getSVTRequestForm(Model model,
+    @RequestParam(name = "replace", required = false) String replace
+    ) {
+    byte[] signedDoc = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    String docName = (String) httpSession.getAttribute(SessionAttr.docName.name());
+
+    List<FormParameter> formParameterList = new ArrayList<>();
+    if (replace != null){
+      formParameterList.add(new FormParameter("replace",replace));
+    }
+    if (docName != null) {
+      formParameterList.add(new FormParameter("name",docName));
+    }
+
+    model.addAttribute("targetUrl", "issue-svt");
+    model.addAttribute("dataObjectName","document");
+    model.addAttribute("b64Data", Base64.toBase64String(signedDoc));
+    model.addAttribute("formParams", formParameterList);
+
+    return "post-form";
+
+  }
+
+
+
 
 
 }

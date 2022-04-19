@@ -8,10 +8,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import se.idsec.signservice.xml.DOMUtils;
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 import se.swedenconnect.sigval.commons.data.SignedDocumentValidationResult;
@@ -60,22 +57,13 @@ public class ValidationReportController {
     this.signatureValidatorProvider = signatureValidatorProvider;
   }
 
-  @RequestMapping("/report")
+  @RequestMapping(value = "/report", method = RequestMethod.POST)
   public ResponseEntity<InputStreamResource> getValidationReport(
     @RequestParam(name = "certpath", required = false) String certpath,
     @RequestParam(name = "include-docs", required = false) String includeDocs,
-    @RequestParam(name = "id", required = false) String id,
-    @RequestParam(name = "document", required = false) String document,
-    HttpEntity<byte[]> requestPayload,
-    HttpServletRequest request
+    @RequestParam(name = "document", required = false) String document
   ) throws SignatureException, IOException {
     byte[] documentBytes = null;
-/*
-    if (requestPayload != null && requestPayload.getBody() != null && requestPayload.getBody().length > 0){
-      documentBytes = requestPayload.getBody();
-    } else {
-    }
-*/
     if (document != null) {
       try {
         documentBytes = Base64.decode(document);
@@ -90,7 +78,6 @@ public class ValidationReportController {
     }
 
     SigvalReportOptions sigvalReportOptions = getSigValReportOptions(certpath, includeDocs);
-    String requestId = id;
     byte[] signedValidationReport;
 
     // Generate report based on document type
@@ -101,14 +88,14 @@ public class ValidationReportController {
       SignedDocumentValidationResult<ExtendedXmlSigvalResult> xmlResult = xmlSignedDocumentValidator.extendedResultValidation(
         DOMUtils.bytesToDocument(documentBytes));
       signedValidationReport = signatureValidatorProvider.getXmlSigValReportGenerator().getSignedValidationReport(
-        xmlResult, sigvalReportOptions, requestId, signatureValidatorProvider.getReportSigner());
+        xmlResult, sigvalReportOptions, signatureValidatorProvider.getReportSigner());
       break;
     case PDF:
       ExtendedPDFSignatureValidator pdfSignatureValidator = signatureValidatorProvider.getPdfSignatureValidator();
       SignedDocumentValidationResult<ExtendedPdfSigValResult> pdfResult = pdfSignatureValidator.extendedResultValidation(
         documentBytes);
       signedValidationReport = signatureValidatorProvider.getPdfSigValReportGenerator().getSignedValidationReport(
-        pdfResult, sigvalReportOptions, requestId, signatureValidatorProvider.getReportSigner());
+        pdfResult, sigvalReportOptions, signatureValidatorProvider.getReportSigner());
       break;
     case JOSE:
     case JOSE_COMPACT:
@@ -116,7 +103,7 @@ public class ValidationReportController {
       SignedDocumentValidationResult<ExtendedJOSESigvalResult> joseResult = joseSignedDocumentValidator.extendedResultValidation(
         documentBytes);
       signedValidationReport = signatureValidatorProvider.getJoseSigValReportGenerator().getSignedValidationReport(
-        joseResult, sigvalReportOptions, requestId, signatureValidatorProvider.getReportSigner());
+        joseResult, sigvalReportOptions, signatureValidatorProvider.getReportSigner());
       break;
     default:
       log.debug("Bad request - data type not recognized");

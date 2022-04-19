@@ -76,11 +76,11 @@ public class BeanConfig {
     @Value("${sigval-service.svt.keySourceCertLocation}")  String keySourceCertLocation,
     @Value("${sigval-service.svt.keySourceAlias}")  String keySourceAlias,
     @Value("${sigval-service.svt.keySourcePass}")  String keySourcePass,
-    @Value("${sigval-service.svt.keySourceType}")  String reportKeySourceType,
-    @Value("${sigval-service.svt.keySourceLocation}")  String reportKeySourceLocation,
-    @Value("${sigval-service.svt.keySourceCertLocation}")  String reportKeySourceCertLocation,
-    @Value("${sigval-service.svt.keySourceAlias}")  String reportKeySourceAlias,
-    @Value("${sigval-service.svt.keySourcePass}")  String reportKeySourcePass,
+    @Value("${sigval-service.report.keySourceType}")  String reportKeySourceType,
+    @Value("${sigval-service.report.keySourceLocation}")  String reportKeySourceLocation,
+    @Value("${sigval-service.report.keySourceCertLocation}")  String reportKeySourceCertLocation,
+    @Value("${sigval-service.report.keySourceAlias}")  String reportKeySourceAlias,
+    @Value("${sigval-service.report.keySourcePass}")  String reportKeySourcePass,
     @Value("${sigval-service.pkcs11.reloadable-keys}") boolean pkcs11ReloadableKeys,
     @Autowired PKCS11Provider pkcs11Provider
   ){
