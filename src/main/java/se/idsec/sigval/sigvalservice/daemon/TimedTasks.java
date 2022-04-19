@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import se.idsec.sigval.cert.validity.crl.CRLCache;
+import se.swedenconnect.sigval.cert.validity.crl.CRLCache;
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 
 import java.io.IOException;

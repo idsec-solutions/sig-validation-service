@@ -3,7 +3,7 @@ $(document).ready(function () {
         uploadUrl: "sigupload", // server upload action
         uploadAsync: false,
         showPreview: false,
-        allowedFileExtensions: ['xml',"pdf"],
+        allowedFileExtensions: ['xml',"pdf","json","jose"],
         maxFileSize: maxFileSizeKb,
         maxFileCount: 1,
         language: lang,

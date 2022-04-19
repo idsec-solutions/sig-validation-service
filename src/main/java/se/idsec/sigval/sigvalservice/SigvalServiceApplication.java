@@ -12,8 +12,9 @@ import java.security.Security;
 public class SigvalServiceApplication {
 
   public static void main(String[] args) {
+    System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
+    Security.insertProviderAt(new BouncyCastleProvider(), 2);
     org.apache.xml.security.Init.init();
-    Security.addProvider(new BouncyCastleProvider());
     SpringApplication.run(SigvalServiceApplication.class, args);
   }
 

@@ -5,9 +5,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 import se.idsec.sigval.sigvalservice.configuration.ui.BasicUiModel;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIText;
+
+import java.io.IOException;
 
 @Controller
 public class ErrorController {
@@ -57,7 +61,6 @@ public class ErrorController {
         model.addAttribute("lang", lang);
         model.addAttribute("text", uiText.getBundle(UIText.UiBundle.resultText, lang));
     }
-
 
 
 }

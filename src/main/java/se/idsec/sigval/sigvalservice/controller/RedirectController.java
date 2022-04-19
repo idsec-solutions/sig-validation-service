@@ -1,23 +1,22 @@
 package se.idsec.sigval.sigvalservice.controller;
 
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import se.idsec.sigval.commons.document.DocType;
+import se.swedenconnect.sigval.commons.document.DocType;
 
 import javax.servlet.http.HttpSession;
 
 @Controller
+@NoArgsConstructor
 public class RedirectController {
 
-  private final HttpSession httpSession;
+  //private final HttpSession httpSession;
 
-  @Autowired
-  public RedirectController(HttpSession httpSession) {
-    this.httpSession = httpSession;
-  }
 
-  @RequestMapping("/issue-svt")
+/*
+  @RequestMapping("/issue-svt-legacy")
   public String redirectToSvtIssuingService(){
 
     DocType docType = (DocType) httpSession.getAttribute(SessionAttr.docType.name());
@@ -28,9 +27,13 @@ public class RedirectController {
       return "redirect:/xmlsvt";
     case PDF:
       return "redirect:/pdfsvt";
+    case JOSE:
+    case JOSE_COMPACT:
+      return "redirect:/josesvt";
     }
     return "redirect:/";
   }
+*/
 
   @RequestMapping("/home")
   public String langSelect(){
