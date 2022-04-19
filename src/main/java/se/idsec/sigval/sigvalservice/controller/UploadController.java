@@ -1,18 +1,23 @@
 package se.idsec.sigval.sigvalservice.controller;
 
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSObjectJSON;
 import lombok.extern.log4j.Log4j2;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import se.idsec.sigval.commons.data.ExtendedSigValResult;
-import se.idsec.sigval.commons.data.SignedDocumentValidationResult;
-import se.idsec.sigval.commons.document.DocType;
+import se.swedenconnect.sigval.commons.data.ExtendedSigValResult;
+import se.swedenconnect.sigval.commons.data.SignedDocumentValidationResult;
+import se.swedenconnect.sigval.commons.document.DocType;
 import se.idsec.sigval.sigvalservice.configuration.FileSize;
-import se.idsec.sigval.xml.utils.XMLDocumentBuilder;
+import se.swedenconnect.sigval.xml.utils.XMLDocumentBuilder;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -96,10 +101,36 @@ public class UploadController {
     case PDF:
       checkPdfFileValidity(bytes);
       break;
+    case JOSE:
+    case JOSE_COMPACT:
+      checkJoseValidity(bytes);
+      break;
     default:
       log.warn("Upload rejected - Unrecognized file content");
       throw new IllegalArgumentException("Upload rejected - Illegal file content");
     }
+  }
+
+  private void checkJoseValidity(byte[] bytes) throws IOException {
+    try {
+      JWSObject.parse(new String(bytes, StandardCharsets.UTF_8));
+      log.debug("Found compact serialized JWS");
+      return;
+    }
+    catch (ParseException e) {
+      log.debug("No compact serialized JWS signature");
+    }
+
+    try {
+      JWSObjectJSON.parse(new String(bytes, StandardCharsets.UTF_8));
+      log.debug("Found JSON serialized JWS");
+      return;
+    }
+    catch (ParseException e) {
+      log.debug("No JSON serialized JWS signature");
+    }
+    log.warn("Error processing the uploaded JOSE document");
+    throw new IOException("Error parsing uploaded JOSE document");
   }
 
   private void checkXmlFileValidity(byte[] bytes) throws IOException{

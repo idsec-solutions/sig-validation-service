@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import se.idsec.sigval.cert.validity.crl.CRLCache;
-import se.idsec.sigval.cert.validity.crl.impl.CRLCacheImpl;
+import se.swedenconnect.sigval.cert.validity.crl.CRLCache;
+import se.swedenconnect.sigval.cert.validity.crl.impl.CRLCacheImpl;
 import se.idsec.sigval.sigvalservice.configuration.keys.LocalKeySource;
-import se.idsec.sigval.svt.issuer.SVTModel;
+import se.swedenconnect.sigval.svt.issuer.SVTModel;
 import se.swedenconnect.opensaml.pkcs11.PKCS11Provider;
 import se.swedenconnect.opensaml.pkcs11.PKCS11ProviderFactory;
 import se.swedenconnect.opensaml.pkcs11.configuration.PKCS11ProvidedCfgConfiguration;
@@ -70,17 +70,32 @@ public class BeanConfig {
   }
 
   @Bean
-  public LocalKeySource svtKeySource(
+  public Map<String, LocalKeySource> keySourceMap(
     @Value("${sigval-service.svt.keySourceType}")  String keySourceType,
     @Value("${sigval-service.svt.keySourceLocation}")  String keySourceLocation,
     @Value("${sigval-service.svt.keySourceCertLocation}")  String keySourceCertLocation,
     @Value("${sigval-service.svt.keySourceAlias}")  String keySourceAlias,
     @Value("${sigval-service.svt.keySourcePass}")  String keySourcePass,
+    @Value("${sigval-service.svt.keySourceType}")  String reportKeySourceType,
+    @Value("${sigval-service.svt.keySourceLocation}")  String reportKeySourceLocation,
+    @Value("${sigval-service.svt.keySourceCertLocation}")  String reportKeySourceCertLocation,
+    @Value("${sigval-service.svt.keySourceAlias}")  String reportKeySourceAlias,
+    @Value("${sigval-service.svt.keySourcePass}")  String reportKeySourcePass,
     @Value("${sigval-service.pkcs11.reloadable-keys}") boolean pkcs11ReloadableKeys,
     @Autowired PKCS11Provider pkcs11Provider
   ){
     log.info("SVT key source type: {}", keySourceType);
-    return new LocalKeySource(keySourceType, keySourceLocation, keySourcePass, keySourceAlias, keySourceCertLocation,pkcs11Provider, pkcs11ReloadableKeys);
+
+    LocalKeySource svtKeySource = new LocalKeySource(keySourceType, keySourceLocation, keySourcePass,
+      keySourceAlias, keySourceCertLocation,pkcs11Provider, pkcs11ReloadableKeys);
+    LocalKeySource reportKeySource = new LocalKeySource(reportKeySourceType, reportKeySourceLocation, reportKeySourcePass,
+      reportKeySourceAlias, reportKeySourceCertLocation,pkcs11Provider, pkcs11ReloadableKeys);
+
+    Map<String, LocalKeySource> keySourceMap = new HashMap<>();
+    keySourceMap.put("svt", svtKeySource);
+    keySourceMap.put("report", reportKeySource);
+
+    return keySourceMap;
   }
 
   @Bean

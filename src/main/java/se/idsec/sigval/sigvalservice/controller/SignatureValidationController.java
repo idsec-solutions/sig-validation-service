@@ -10,6 +10,7 @@ import org.xml.sax.SAXException;
 import se.swedenconnect.sigval.commons.data.ExtendedSigValResult;
 import se.swedenconnect.sigval.commons.data.SignedDocumentValidationResult;
 import se.swedenconnect.sigval.commons.document.DocType;
+import se.swedenconnect.sigval.jose.verify.JOSESignedDocumentValidator;
 import se.swedenconnect.sigval.pdf.verify.ExtendedPDFSignatureValidator;
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 import se.idsec.sigval.sigvalservice.result.ResultPageDataGenerator;
@@ -60,6 +61,11 @@ public class SignatureValidationController {
     case PDF:
       ExtendedPDFSignatureValidator pdfValidator = signatureValidatorProvider.getPdfSignatureValidator();
       validationResult = pdfValidator.extendedResultValidation(signedDoc);
+      break;
+    case JOSE:
+    case JOSE_COMPACT:
+      JOSESignedDocumentValidator joseSignedDocumentValidator = signatureValidatorProvider.getJoseSignedDocumentValidator();
+      validationResult = joseSignedDocumentValidator.extendedResultValidation(signedDoc);
       break;
     default:
       throw new IOException("Unable to handle uploaded document - illegal document content");

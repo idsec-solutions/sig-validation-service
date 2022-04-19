@@ -54,6 +54,21 @@
         </repository>
     </distributionManagement>
 
+    <dependencyManagement>
+
+        <dependencies>
+
+            <dependency>
+                <groupId>se.idsec.signservice.commons</groupId>
+                <artifactId>signservice-bom</artifactId>
+                <version>1.2.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -90,6 +105,25 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- JAXB -->
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+        </dependency>
+        <!-- JAXB -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+        </dependency>
+
         <!-- IDsec sig val lib -->
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
@@ -113,6 +147,11 @@
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.opensaml</groupId>
+            <artifactId>opensaml-security-ext</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>se.swedenconnect.opensaml</groupId>
             <artifactId>opensaml-pkcs11-support</artifactId>
             <version>1.1.1</version>
         </dependency>
@@ -133,6 +172,17 @@
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
             <version>3.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery-ui</artifactId>
+            <version>1.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery-ui-themes</artifactId>
+            <version>1.13.0</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
