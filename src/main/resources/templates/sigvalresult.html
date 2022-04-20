@@ -7,9 +7,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <script src="webjars/jquery/3.6.0/jquery.min.js"></script>
-    <script src="webjars/jquery-ui/1.13.1/jquery-ui.min.js"></script>
+    <script src="webjars/bootstrap/4.6.1/js/bootstrap.min.js"></script>
     <script src="webjars/popper.js/1.16.1/dist/umd/popper.min.js"></script>
-    <script src="webjars/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="webjars/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
     <script src="webjars/bootstrap-select/1.13.18/js/i18n/defaults-sv_SE.min.js"></script>
     <script src="webjars/highlightjs/11.5.0/highlight.min.js"></script>
@@ -21,7 +20,6 @@
     <link rel="stylesheet" href="webjars/font-awesome/6.1.0/css/all.min.css"/>
     <link rel="stylesheet" href="webjars/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
     <link rel="stylesheet" href="webjars/highlightjs/11.5.0/styles/atom-one-light.min.css"/>
-    <link rel="stylesheet" href="webjars/jquery-ui/1.13.1/jquery-ui.min.css">
     <link rel="stylesheet" href="css/main.css"/>
     <link rel="stylesheet" href="css/result.css"/>
 
@@ -72,9 +70,14 @@
                         </td>
                     </th:block>
                     <td style="text-align: right">
-                        <button class="btn btn-sm btn-outline-dark" style="height: 25px; padding-top: 1px; padding-bottom: 1px;"
-                            th:onclick="${showReportOptions} ? 'openReportDialogue()' : 'directReportRequest()'"
-                            th:text="${text.getString('validationReport')}"></button>
+                        <th:block th:switch="${showReportOptions}">
+                            <button th:case="true" type="button" class="btn btn-sm btn-outline-dark" data-toggle="modal" data-target="#reportOptionsModal"
+                                    style="height: 25px; padding-top: 1px; padding-bottom: 1px;"
+                                    th:text="${text.getString('validationReport')}"></button>
+                            <button th:case="false" class="btn btn-sm btn-outline-dark" style="height: 25px; padding-top: 1px; padding-bottom: 1px;"
+                                    onclick="directReportRequest()"
+                                    th:text="${text.getString('validationReport')}"></button>
+                        </th:block>
                     </td>
                 </tr>
                 <tr>
@@ -195,6 +198,34 @@
     </div>
 </div>
 
+<!-- Report options modal  -->
+<div class="modal" id="reportOptionsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:text="${text.getString('valReportOptions')}"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="includeChainOption">
+                    <label class="form-check-label" for="includeChainOption" th:text="${text.getString('valReportOptIncludeChain')}"></label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="includeSigDataOption">
+                    <label class="form-check-label" for="includeSigDataOption" th:text="${text.getString('valReportOptIncludeSigData')}"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close"  onclick="getValidationReport()" th:text="${text.getString('getReport')}">Get report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Signed document display box -->
 <div id="sigDataDiv" class="confirm-bgr">
     <div class="card metadata-panel">
@@ -221,20 +252,6 @@
             </div>
         </div>
     </div>
-</div>
-<!-- Report options dialogue -->
-<div id="sigreportoptions-dialogue">
-    <p><b th:text="${text.getString('valReportOptions')}"></b></p>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="includeChainOption">
-        <label class="form-check-label" for="includeChainOption" th:text="${text.getString('valReportOptIncludeChain')}"></label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="includeSigDataOption">
-        <label class="form-check-label" for="includeSigDataOption" th:text="${text.getString('valReportOptIncludeSigData')}"></label>
-    </div>
-    <hr>
-    <button class="btn btn-sm btn-primary" id="getReportButton" onclick="getValidationReport()" th:text="${text.getString('getReport')}">Get report</button>
 </div>
 
 <!-- Signed content display box -->

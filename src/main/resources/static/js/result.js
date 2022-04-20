@@ -30,26 +30,11 @@ $(document).ready(function () {
         $(this).css("height", viewHeight);
     });
 
-    $("#sigreportoptions-dialogue").dialog({
-        autoOpen: false,
-        show: {
-            effect: "blind",
-            duration: 300
-        }
-    });
-
-
 });
 
 function downloadSvt(){
     let win = window.open("svt-request-form", "_blank");
     win.focus()
-}
-
-function openReportDialogue(){
-    $("#sigreportoptions-dialogue").dialog("open");
-    document.getElementById("getReportButton").focus();
-//    $("#getReportButton").focus();
 }
 
 function getValidationReport(){
@@ -62,8 +47,6 @@ function getValidationReport(){
     if ($("#includeSigDataOption").prop("checked")){
         includeSigDocs = "true";
     }
-
-    $("#sigreportoptions-dialogue").dialog("close");
 
     window.open("report-request-form?certpath=" + includeChain + "&include-docs=" + includeSigDocs, "_blank");
 }
