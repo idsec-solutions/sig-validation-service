@@ -41,6 +41,7 @@ import se.swedenconnect.sigval.xml.verify.ExtendedXMLSignedDocumentValidator;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
 
 /**
@@ -89,8 +90,8 @@ public class ValidationReportController {
     }
 
     if (documentBytes == null){
-      log.debug("Bad request - no document provided in the request");
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      log.debug("Bad validation request - no document provided in the request or document was to large");
+      return getErrorResponse("Bad request for validation report - no document provided in the request or document was to large");
     }
 
     SigvalReportOptions sigvalReportOptions = getSigValReportOptions(certpath, includeDocs);
@@ -122,16 +123,25 @@ public class ValidationReportController {
         joseResult, sigvalReportOptions, signatureValidatorProvider.getReportSigner());
       break;
     default:
-      log.debug("Bad request - data type not recognized");
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      log.debug("Bad validation request - data type not recognized");
+      return getErrorResponse("Bad request - data type not recognized");
     }
 
     return ResponseEntity
       .ok()
       .headers(new HttpHeaders(headerMap))
       .contentLength(signedValidationReport.length)
-      .contentType(MediaType.parseMediaType("text/xml"))
+      .contentType(MediaType.TEXT_XML)
       .body(new InputStreamResource(new ByteArrayInputStream(signedValidationReport)));
+  }
+
+  private ResponseEntity<InputStreamResource> getErrorResponse(String message) {
+    byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
+    return ResponseEntity
+      .badRequest()
+      .contentLength(messageBytes.length)
+      .contentType(MediaType.TEXT_PLAIN)
+      .body(new InputStreamResource(new ByteArrayInputStream(messageBytes)));
   }
 
   private SigvalReportOptions getSigValReportOptions(String certpath, String includeDocs) {
