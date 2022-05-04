@@ -18,6 +18,7 @@ package se.idsec.sigval.sigvalservice.controller;
 
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import se.swedenconnect.sigval.xml.utils.XMLDocumentBuilder;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 @Slf4j
@@ -63,29 +65,43 @@ public class SVTIssuanceController {
     this.svtModel = svtModel;
   }
 
+  @RequestMapping("/issue-svt-internal")
+  public ResponseEntity<InputStreamResource> issueSvtInternal(
+    @RequestParam(name = "replace", required = false) String replace) throws IOException, RuntimeException {
+    byte[] documentBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    String name = (String) httpSession.getAttribute(SessionAttr.docName.name());
+    return issueSvtFunction(documentBytes, name, replace);
+  }
+
   @RequestMapping(value = "/issue-svt", method = RequestMethod.POST)
   public ResponseEntity<InputStreamResource> issueSvtApi(
+    InputStream postedDocumentStream,
     @RequestParam(name = "name", required = false) String name,
-    @RequestParam(name = "document", required = false) String document) throws IOException, RuntimeException {
+    @RequestParam(name = "replace", required = false) String replace) throws IOException, RuntimeException {
+    byte[] documentBytes = postedDocumentStream == null
+      ? null
+      : IOUtils.toByteArray(postedDocumentStream);
+    return issueSvtFunction(documentBytes, name, replace);
+  }
 
-    byte[] documentBytes = null;
-    if (document != null) {
-      try {
-        documentBytes = Base64.decode(document);
-      }
-      catch (Exception ex) {
-        log.debug("Illegal document data");
-      }
-    }
+  public ResponseEntity<InputStreamResource> issueSvtFunction(byte[] documentBytes,
+    String name, String replace) throws IOException, RuntimeException {
 
     if (documentBytes == null) {
       log.debug("Bad request - no document provided in the request");
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    SVTExtendpolicy svtExtendpolicy = defaultReplaceSvt
-      ? SVTExtendpolicy.REPLACE
-      : SVTExtendpolicy.EXTEND;
+    SVTExtendpolicy svtExtendpolicy;
+    if (StringUtils.isNotBlank(replace)){
+      svtExtendpolicy = replace.equalsIgnoreCase("true")
+        ? SVTExtendpolicy.REPLACE
+        : SVTExtendpolicy.EXTEND;
+    } else {
+      svtExtendpolicy = defaultReplaceSvt
+        ? SVTExtendpolicy.REPLACE
+        : SVTExtendpolicy.EXTEND;
+    }
 
     byte[] svtEnhancedDocument;
     MediaType mediaType;

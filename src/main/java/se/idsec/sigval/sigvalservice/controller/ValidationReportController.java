@@ -17,14 +17,19 @@
 package se.idsec.sigval.sigvalservice.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.util.encoders.Base64;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import se.idsec.signservice.xml.DOMUtils;
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 import se.swedenconnect.sigval.commons.data.SignedDocumentValidationResult;
@@ -38,9 +43,10 @@ import se.swedenconnect.sigval.report.data.SigvalReportOptions;
 import se.swedenconnect.sigval.xml.data.ExtendedXmlSigvalResult;
 import se.swedenconnect.sigval.xml.verify.ExtendedXMLSignedDocumentValidator;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
 
@@ -54,6 +60,7 @@ import java.security.SignatureException;
 @RestController
 public class ValidationReportController {
 
+  private final HttpSession httpSession;
   private static final MultiValueMap<String,String> headerMap;
 
   static {
@@ -70,24 +77,35 @@ public class ValidationReportController {
   private final SignatureValidatorProvider signatureValidatorProvider;
 
   @Autowired
-  public ValidationReportController(SignatureValidatorProvider signatureValidatorProvider) {
+  public ValidationReportController(SignatureValidatorProvider signatureValidatorProvider, HttpSession httpSession) {
     this.signatureValidatorProvider = signatureValidatorProvider;
+    this.httpSession = httpSession;
+  }
+
+  @RequestMapping("/report-internal")
+  public ResponseEntity<InputStreamResource> getValidationReportInternal(
+    @RequestParam(name = "certpath", required = false) String certpath,
+    @RequestParam(name = "include-docs", required = false) String includeDocs
+  ) throws SignatureException, IOException {
+    byte[] documentBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
+    return getValidationReport(documentBytes, certpath, includeDocs);
   }
 
   @RequestMapping(value = "/report", method = RequestMethod.POST)
-  public ResponseEntity<InputStreamResource> getValidationReport(
+  public ResponseEntity<InputStreamResource> getValidationReportAPI(
+    InputStream postedDocumentStream,
     @RequestParam(name = "certpath", required = false) String certpath,
-    @RequestParam(name = "include-docs", required = false) String includeDocs,
-    @RequestParam(name = "document", required = false) String document
+    @RequestParam(name = "include-docs", required = false) String includeDocs
   ) throws SignatureException, IOException {
-    byte[] documentBytes = null;
-    if (document != null) {
-      try {
-        documentBytes = Base64.decode(document);
-      } catch (Exception ex) {
-        log.debug("Illegal document data");
-      }
-    }
+    byte[] documentBytes = postedDocumentStream == null
+      ? null
+      : IOUtils.toByteArray(postedDocumentStream);
+    return getValidationReport(documentBytes, certpath, includeDocs);
+  }
+
+
+  public ResponseEntity<InputStreamResource> getValidationReport(byte[] documentBytes, String certpath, String includeDocs
+  ) throws SignatureException, IOException {
 
     if (documentBytes == null){
       log.debug("Bad validation request - no document provided in the request or document was to large");
@@ -163,7 +181,7 @@ public class ValidationReportController {
       if (includeDocs.equalsIgnoreCase("true")){
         includeSignedData = true;
       }
-      if (includeDocs.equalsIgnoreCase("fasle")){
+      if (includeDocs.equalsIgnoreCase("false")){
         includeSignedData = false;
       }
     }

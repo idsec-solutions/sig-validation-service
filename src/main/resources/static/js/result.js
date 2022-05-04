@@ -16,9 +16,9 @@
 
 $(document).ready(function () {
     $('[id^=sigDataDiv]').hide();
-    var windowHeight = window.innerHeight;
-    windowHeight = parseInt((windowHeight - 115) * 94 / 100);
-    var viewHeight = windowHeight > 100 ? windowHeight : 100;
+    let windowHeight = window.innerHeight;
+    windowHeight = ((windowHeight - 115) * 94) / 100;
+    let viewHeight = windowHeight > 100 ? windowHeight : 100;
     $('[id^=sigDataDisplayDiv]').css("height", viewHeight).attr("overflow", "auto");
 
     if ($("#pdfFrame").length){
@@ -33,7 +33,7 @@ $(document).ready(function () {
 });
 
 function downloadSvt(){
-    let win = window.open("svt-request-form", "_blank");
+    let win = window.open("issue-svt-internal", "_blank");
     win.focus()
 }
 
@@ -48,9 +48,9 @@ function getValidationReport(){
         includeSigDocs = "true";
     }
 
-    window.open("report-request-form?certpath=" + includeChain + "&include-docs=" + includeSigDocs, "_blank");
+    window.open("report-internal?certpath=" + includeChain + "&include-docs=" + includeSigDocs, "_blank");
 }
 
 function directReportRequest() {
-    window.open("report-request-form", "_blank");
+    window.open("report-internal", "_blank");
 }

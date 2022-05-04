@@ -28,29 +28,6 @@ import javax.servlet.http.HttpSession;
 @NoArgsConstructor
 public class RedirectController {
 
-  //private final HttpSession httpSession;
-
-
-/*
-  @RequestMapping("/issue-svt-legacy")
-  public String redirectToSvtIssuingService(){
-
-    DocType docType = (DocType) httpSession.getAttribute(SessionAttr.docType.name());
-    if  (docType == null) return "redirect:/";
-    switch (docType) {
-
-    case XML:
-      return "redirect:/xmlsvt";
-    case PDF:
-      return "redirect:/pdfsvt";
-    case JOSE:
-    case JOSE_COMPACT:
-      return "redirect:/josesvt";
-    }
-    return "redirect:/";
-  }
-*/
-
   @RequestMapping("/home")
   public String langSelect(){
     return "redirect:/";
