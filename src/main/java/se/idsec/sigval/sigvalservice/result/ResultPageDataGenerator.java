@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Element;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 import se.swedenconnect.sigval.commons.data.ExtendedSigValResult;
 import se.swedenconnect.sigval.commons.data.SigValIdentifiers;
@@ -271,7 +272,7 @@ public class ResultPageDataGenerator {
         .map(attributeMapping -> {
           Attribute attribute = attributeMapping.getAttribute();
           SamlAttribute samlAttr = SamlAttribute.getAttributeFromSamlName(attribute.getName());
-          String attributeValue = new StringBuilder().append(attribute.getAttributeValues().get(0)).toString();
+          String attributeValue =getAttrValueString(attribute);
           return new DisplayAttribute(UIUtils.fromIso(
             UIUtils.fromUtf(uiText.getBundle(UIText.UiBundle.samlAttr, lang).getString(samlAttr.name()))), attributeValue, samlAttr.getDisplayOrder());
         })
@@ -282,6 +283,19 @@ public class ResultPageDataGenerator {
       log.error("Unable to parse subject name from authContextExtension", ex);
       return new ArrayList<>();
     }
+  }
+
+  private String getAttrValueString(Attribute samlAttr) {
+    if (samlAttr.getAttributeValues() == null || samlAttr.getAttributeValues().size() ==0){
+      return "";
+    }
+    Object valueObject = samlAttr.getAttributeValues().get(0);
+    if (valueObject instanceof Element){
+      Element valueElement = (Element) valueObject;
+      String textContent = valueElement.getTextContent();
+      return textContent;
+    }
+    return new StringBuilder().append(valueObject).toString();
   }
 
   private List<DisplayAttribute> getAttrsFromSubjectField(X509Certificate signCert, String lang) {

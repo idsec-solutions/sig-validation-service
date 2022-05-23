@@ -81,7 +81,7 @@ public class ResultController {
       (SignedDocumentValidationResult<? extends ExtendedSigValResult>) httpSession.getAttribute(SessionAttr.validationResult.name());
 
     if (validationResult == null) return "redirect:/";
-    ResultPageData resultPageData = resultPageDataGenerator.getResultPageData(validationResult, docName, docMimeType, lang);
+      ResultPageData resultPageData = resultPageDataGenerator.getResultPageData(validationResult, docName, docMimeType, lang);
 
     String xmlPrettyPrint = docType.equals(DocType.XML) ? XMLDocumentBuilder.getDocText(XMLDocumentBuilder.getDocument(signedDoc)) : null;
 
