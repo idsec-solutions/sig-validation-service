@@ -65,6 +65,44 @@ The SVT is tool for preservation and archival of validation result. This means t
 
 The SVT is a complementary technology to various solutions used to validate signatures, including complex solutions for validation of old signatures. Once the validation solution has been used to validate the signature, then that validation result can be preserved using SVT.
 
+## REST API for signature validation and issuing SVT
+
+### Signature validation REST API
+
+This REST API allows an external service to upload a signed document (XML, PDF or JOSE) for validation and to obtain a full validation report for this document
+according to ETSI TS 119 102-2
+
+| Property     | value                                                                        |
+|--------------|------------------------------------------------------------------------------|
+| URL          | "`/report`" (e.g. `http://example.com/sigval/report`)                        |
+| method       | POST                                                                         |
+| data         | the bytes of the document to be validated (PDF, XML or JOSE signed document) |
+| content-type | Any (Recommended to use the content-type of the uploaded document)           |
+| returns      | XML document containing the ETSI TS 119 102-2 validation report              |
+
+| query parameters | value                                                                                                                                                                                                 |
+|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `certpath`       | Value `true` includes information about the full certificate path in the validation report. Default = `false` (only include signer certificate).                                                      |
+| `include-docs`   | Value `true` includes the data signed by the signature (JSON, XML) or the version of the document before signing (PDF) in the report for each signature. Default = `false` (only include hash value). |
+
+### SVT issuance REST API
+
+This REST API allows an external service to upload a signed document (XML, PDF of JOSE) for validation and returns the same document enhanced with an SVT
+issued by this service.
+
+| Property     | value                                                                        |
+|--------------|------------------------------------------------------------------------------|
+| URL          | "`/issue-svt`" (e.g. `http://example.com/sigval/issue-svt`)                  |
+| method       | POST                                                                         |
+| data         | the bytes of the document to be validated (PDF, XML or JOSE signed document) |
+| content-type | Any (Recommended to use the content-type of the uploaded document)           |
+| returns      | the uploaded document enhanced with an SVT (on success)                      |
+
+| query parameters | value                                                                                                                                    |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `name`           | The name of the document used when returning the svt enhanced signed document                                                            |
+| `replace`        | Value `true` causes any existing SVT in the document to be replaced with a new SVT. Default = `false` (Add this SVT to any existing SVT) |
+
 ## Demo deployment
 
 A demo deployment of this service is available here: [https://sandbox.swedenconnect.se/sigval/](https://sandbox.swedenconnect.se/sigval/).
