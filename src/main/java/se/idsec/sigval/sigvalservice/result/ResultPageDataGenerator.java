@@ -273,8 +273,7 @@ public class ResultPageDataGenerator {
           Attribute attribute = attributeMapping.getAttribute();
           SamlAttribute samlAttr = SamlAttribute.getAttributeFromSamlName(attribute.getName());
           String attributeValue =getAttrValueString(attribute);
-          return new DisplayAttribute(UIUtils.fromIso(
-            UIUtils.fromUtf(uiText.getBundle(UIText.UiBundle.samlAttr, lang).getString(samlAttr.name()))), attributeValue, samlAttr.getDisplayOrder());
+          return getDispalyAttribute(attribute, uiText.getBundle(UIText.UiBundle.samlAttr, lang), samlAttr, attributeValue);
         })
         .sorted(Comparator.comparingInt(DisplayAttribute::getOrder))
         .collect(Collectors.toList());
@@ -283,6 +282,14 @@ public class ResultPageDataGenerator {
       log.error("Unable to parse subject name from authContextExtension", ex);
       return new ArrayList<>();
     }
+  }
+
+  private DisplayAttribute getDispalyAttribute(Attribute attribute, UIText.UTF8Bundle bundle, SamlAttribute samlAttr, String attributeValue) {
+    if (samlAttr != null) {
+      return new DisplayAttribute(UIUtils.fromIso(
+        UIUtils.fromUtf(bundle.getString(samlAttr.name()))), attributeValue, samlAttr.getDisplayOrder());
+    }
+    return new DisplayAttribute(attribute.getFriendlyName(), attributeValue, 99);
   }
 
   private String getAttrValueString(Attribute samlAttr) {
