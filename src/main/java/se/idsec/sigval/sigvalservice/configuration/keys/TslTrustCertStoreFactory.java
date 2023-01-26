@@ -83,10 +83,15 @@ public class TslTrustCertStoreFactory {
       }
       SignedData signedData = SignedData.getInstance(cmsContentInfo.getContent());
       Iterator<ASN1Encodable> iterator = signedData.getCertificates().iterator();
+      int certCount = 0;
+      log.debug("Collecting certificates from trust service store");
       while (iterator.hasNext()){
         try {
+          certCount++;
           byte[] certByte = iterator.next().toASN1Primitive().getEncoded("DER");
-          certificateList.add(CertUtils.getCert(new ByteArrayInputStream(certByte)));
+          X509Certificate cert = CertUtils.getCert(new ByteArrayInputStream(certByte));
+          certificateList.add(cert);
+          log.trace("Added certificate {} for {}", certCount, cert.getSubjectX500Principal());
         } catch (Exception ex){
           log.warn("Unable to decode certificate from signed data");
         }

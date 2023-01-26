@@ -25,6 +25,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.sigval.commons.algorithms.JWSAlgorithmRegistry;
 import se.swedenconnect.sigval.commons.algorithms.PublicKeyType;
 import se.swedenconnect.sigval.commons.timestamp.TimeStampPolicyVerifier;
@@ -50,7 +52,6 @@ import se.swedenconnect.sigval.pdf.verify.impl.PDFSingleSignatureValidatorImpl;
 import se.swedenconnect.sigval.pdf.verify.impl.SVTenabledPDFDocumentSigVerifier;
 import se.swedenconnect.sigval.pdf.verify.policy.PDFSignaturePolicyValidator;
 import se.swedenconnect.sigval.pdf.verify.policy.impl.PkixPdfSignaturePolicyValidator;
-import se.idsec.sigval.sigvalservice.configuration.keys.LocalKeySource;
 import se.swedenconnect.sigval.report.xml.ReportSigner;
 import se.swedenconnect.sigval.svt.algorithms.SVTAlgoRegistry;
 import se.swedenconnect.sigval.xml.policy.XMLSignaturePolicyValidator;
@@ -80,7 +81,7 @@ public class SignatureValidatorProvider {
   public static final String REPORT_KEYSOURCE = "report";
 
   private final CertificateValidators certValidators;
-  private final Map<String, LocalKeySource> keySourceMap;
+  private final Map<String, PkiCredential> pkiCredentialMap;
 
   @Value("${sigval-service.svt.model.sig-algo}") String svtSigAlgo;
   @Value("${sigval-service.svt.timestamp.policy:#{null}}") String timestampPolicy;
@@ -108,9 +109,9 @@ public class SignatureValidatorProvider {
 
 
   @Autowired
-  public SignatureValidatorProvider(CertificateValidators certValidators, Map<String, LocalKeySource> keySourceMap) {
+  public SignatureValidatorProvider(CertificateValidators certValidators, Map<String, PkiCredential> pkiCredentialMap) {
     this.certValidators = certValidators;
-    this.keySourceMap = keySourceMap;
+    this.pkiCredentialMap = pkiCredentialMap;
   }
 
   public void loadValidators() throws JOSEException, NoSuchAlgorithmException, IOException, CertificateException {
@@ -133,8 +134,8 @@ public class SignatureValidatorProvider {
   }
 
   private ReportSigner reportSigner() {
-    return new ReportSigner(keySourceMap.get(REPORT_KEYSOURCE).getCredential().getPrivateKey(),
-      new ArrayList<>(keySourceMap.get(REPORT_KEYSOURCE).getCredential().getEntityCertificateChain()));
+    return new ReportSigner(pkiCredentialMap.get(REPORT_KEYSOURCE).getPrivateKey(),
+      new ArrayList<>(pkiCredentialMap.get(REPORT_KEYSOURCE).getCertificateChain()));
   }
 
   private DefalutXMLSigValReportGenerator xmlSigValReportGenerator() {
@@ -168,8 +169,8 @@ public class SignatureValidatorProvider {
   private JOSEDocumentSVTIssuer joseDocumentSVTIssuer() throws NoSuchAlgorithmException, JOSEException {
     JOSESVTSigValClaimsIssuer claimsIssuer = new JOSESVTSigValClaimsIssuer(
       svtJWSAlgorithm,
-      Objects.requireNonNull(keySourceMap.get(SVT_KEYSOURCE).getCredential().getPrivateKey()),
-      Collections.singletonList(keySourceMap.get(SVT_KEYSOURCE).getCredential().getEntityCertificate()),
+      Objects.requireNonNull(pkiCredentialMap.get(SVT_KEYSOURCE).getPrivateKey()),
+      Collections.singletonList(pkiCredentialMap.get(SVT_KEYSOURCE).getCertificate()),
       joseSignatureDataValidator
     );
     return new JOSEDocumentSVTIssuer(claimsIssuer);
@@ -177,8 +178,8 @@ public class SignatureValidatorProvider {
 
   private DefaultPDFDocTimestampSignatureInterface svtTsSigner() {
     DefaultPDFDocTimestampSignatureInterface timeStampSigner = new DefaultPDFDocTimestampSignatureInterface(
-      keySourceMap.get(SVT_KEYSOURCE).getCredential().getPrivateKey(),
-      Collections.singletonList(keySourceMap.get(SVT_KEYSOURCE).getCredential().getEntityCertificate()),
+      pkiCredentialMap.get(SVT_KEYSOURCE).getPrivateKey(),
+      Collections.singletonList(pkiCredentialMap.get(SVT_KEYSOURCE).getCertificate()),
       SVTAlgoRegistry.getAlgoParams(svtJWSAlgorithm).getSigAlgoId());
     if (StringUtils.isNotEmpty(timestampPolicy)){
       timeStampSigner.setTimeStampPolicyOid(new ASN1ObjectIdentifier(timestampPolicy));
@@ -189,8 +190,8 @@ public class SignatureValidatorProvider {
   PDFSVTSigValClaimsIssuer pdfsvtSigValClaimsIssuer() throws NoSuchAlgorithmException, JOSEException {
     return new PDFSVTSigValClaimsIssuer(
       svtJWSAlgorithm,
-      Objects.requireNonNull(keySourceMap.get(SVT_KEYSOURCE).getCredential().getPrivateKey()),
-      Collections.singletonList(keySourceMap.get(SVT_KEYSOURCE).getCredential().getEntityCertificate()),
+      Objects.requireNonNull(pkiCredentialMap.get(SVT_KEYSOURCE).getPrivateKey()),
+      Collections.singletonList(pkiCredentialMap.get(SVT_KEYSOURCE).getCertificate()),
       pdfSignatureValidator);
   }
 
@@ -218,8 +219,8 @@ public class SignatureValidatorProvider {
   public XMLDocumentSVTIssuer xmlDocumentSVTIssuer() throws JOSEException, NoSuchAlgorithmException {
     XMLSVTSigValClaimsIssuer claimsIssuer = new XMLSVTSigValClaimsIssuer(
       svtJWSAlgorithm,
-      Objects.requireNonNull(keySourceMap.get(SVT_KEYSOURCE).getCredential().getPrivateKey()),
-      Collections.singletonList(keySourceMap.get(SVT_KEYSOURCE).getCredential().getEntityCertificate()),
+      Objects.requireNonNull(pkiCredentialMap.get(SVT_KEYSOURCE).getPrivateKey()),
+      Collections.singletonList(pkiCredentialMap.get(SVT_KEYSOURCE).getCertificate()),
       xmlSignatureElementValidator
     );
     return new XMLDocumentSVTIssuer(claimsIssuer);
@@ -228,7 +229,7 @@ public class SignatureValidatorProvider {
   private JWSAlgorithm jwsAlgorithm() throws IOException, NoSuchAlgorithmException {
     JWSAlgorithm svtJWSSigAlgorithm = JWSAlgorithmRegistry.get(svtSigAlgo);
     SVTAlgoRegistry.AlgoProperties svtAlgoParams = SVTAlgoRegistry.getAlgoParams(svtJWSSigAlgorithm);
-    PublicKeyType pkType = GeneralCMSUtils.getPkParams(keySourceMap.get(SVT_KEYSOURCE).getCertificate().getPublicKey()).getPkType();
+    PublicKeyType pkType = GeneralCMSUtils.getPkParams(pkiCredentialMap.get(SVT_KEYSOURCE).getCertificate().getPublicKey()).getPkType();
 
     // Check consistency with SVT key type
     switch (pkType){
