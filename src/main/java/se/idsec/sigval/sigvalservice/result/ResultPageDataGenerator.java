@@ -22,6 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
+import se.swedenconnect.cert.extensions.data.saci.Attribute;
+import se.swedenconnect.cert.extensions.data.saci.AttributeMapping;
+import se.swedenconnect.cert.extensions.data.saci.AuthContextInfo;
+import se.swedenconnect.cert.extensions.data.saci.SAMLAuthContext;
 import se.swedenconnect.sigval.commons.data.ExtendedSigValResult;
 import se.swedenconnect.sigval.commons.data.SigValIdentifiers;
 import se.swedenconnect.sigval.commons.data.SignedDocumentValidationResult;
@@ -36,10 +40,6 @@ import se.swedenconnect.sigval.svt.claims.PolicyValidationClaims;
 import se.swedenconnect.sigval.svt.claims.ValidationConclusion;
 import se.swedenconnect.sigval.xml.data.ExtendedXmlSigvalResult;
 import se.swedenconnect.cert.extensions.AuthnContext;
-import se.swedenconnect.schemas.cert.authcont.saci_1_0.AttributeMapping;
-import se.swedenconnect.schemas.cert.authcont.saci_1_0.AuthContextInfo;
-import se.swedenconnect.schemas.cert.authcont.saci_1_0.SAMLAuthContext;
-import se.swedenconnect.schemas.saml_2_0.assertion.Attribute;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -251,7 +251,7 @@ public class ResultPageDataGenerator {
         .assertionRef(authContextInfo.getAssertionRef())
         .idp(authContextInfo.getIdentityProvider())
         .loa(authContextInfo.getAuthnContextClassRef())
-        .signingTime(dateFormat.format(authContextInfo.getAuthenticationInstant().toGregorianCalendar().getTime()))
+        .signingTime(dateFormat.format(Date.from(authContextInfo.getAuthenticationInstant())))
         .serviceProvider(authContextInfo.getServiceID());
       List<DisplayAttribute> displayAttributes = getAttrsFromAuthContextExt(authContextExtData, lang);
       builder.signerAttribute(displayAttributes);
