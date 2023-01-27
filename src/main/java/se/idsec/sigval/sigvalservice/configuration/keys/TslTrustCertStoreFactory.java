@@ -19,6 +19,13 @@ package se.idsec.sigval.sigvalservice.configuration.keys;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DERIA5String;
@@ -32,6 +39,7 @@ import se.swedenconnect.cert.extensions.SubjectInformationAccess;
 import se.swedenconnect.cert.extensions.data.OidName;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.cert.*;
@@ -44,15 +52,18 @@ import java.util.List;
 @Getter
 public class TslTrustCertStoreFactory {
 
-  X509Certificate policyRoot;
+  final X509Certificate policyRoot;
+  private final HttpClient httpClient;
   CertStore certStore;
 
-  public TslTrustCertStoreFactory(String policyRootLocation) throws IOException, CertificateException {
+  public TslTrustCertStoreFactory(String policyRootLocation, HttpClient httpClient) throws IOException, CertificateException {
     this.policyRoot = SVAUtils.getCertificate(IOUtils.toByteArray(new FileInputStream(new File(policyRootLocation))));
+    this.httpClient = httpClient;
     init();
   }
-  public TslTrustCertStoreFactory(X509Certificate policyRoot) {
+  public TslTrustCertStoreFactory(X509Certificate policyRoot, HttpClient httpClient) {
     this.policyRoot = policyRoot;
+    this.httpClient = httpClient;
     init();
   }
 
@@ -70,11 +81,11 @@ public class TslTrustCertStoreFactory {
         .findFirst().get();
       String location = ((DERIA5String) generalName.getName()).getString();
 
-      URL url = new URL(location);
-      URLConnection connection = url.openConnection();
-      connection.setConnectTimeout(1000);
-      connection.setReadTimeout(3000);
-      byte[] bytes = IOUtils.toByteArray(connection);
+      HttpResponse httpResponse = httpClient.execute(new HttpGet(location));
+      if (httpResponse.getStatusLine().getStatusCode() != 200) {
+        throw new IOException("Unable to download cert store certificates from " + location);
+      }
+      byte[] bytes = IOUtils.toByteArray(httpResponse.getEntity().getContent());
 
       ASN1InputStream ain = new ASN1InputStream(bytes);
       ContentInfo cmsContentInfo = ContentInfo.getInstance(ain.readObject());

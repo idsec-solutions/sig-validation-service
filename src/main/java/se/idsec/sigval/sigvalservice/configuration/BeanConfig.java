@@ -19,6 +19,17 @@ package se.idsec.sigval.sigvalservice.configuration;
 import lombok.extern.log4j.Log4j2;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +43,9 @@ import se.swedenconnect.sigval.cert.validity.crl.impl.CRLCacheImpl;
 import se.swedenconnect.sigval.svt.issuer.SVTModel;
 
 import java.io.File;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Log4j2
@@ -146,6 +160,33 @@ public class BeanConfig {
     char[] password = keySourcePass != null ? keySourcePass.toCharArray() : null;
     return pkiCredentialFactory.getCredential(
       type, keySourceFile, keySourceAlias, password, certificateFile);
+  }
+
+  @Bean(name = "httpClientBean")
+  HttpClient httpClient(HttpProxyProperties httpProxyProperties)
+    throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+
+    final HttpClientBuilder builder = HttpClientBuilder.create();
+    if (httpProxyProperties != null && httpProxyProperties.getHost() != null) {
+      final HttpHost proxy = new HttpHost(httpProxyProperties.getHost(), httpProxyProperties.getPort());
+      builder
+        .setProxy(proxy)
+        .setDefaultRequestConfig(RequestConfig.custom()
+          .setConnectTimeout(1000)
+          .setConnectionRequestTimeout(1000)
+          .setSocketTimeout(5000)
+          .build());
+      if (httpProxyProperties.getUserName() != null) {
+        CredentialsProvider credentialsPovider = new BasicCredentialsProvider();
+        credentialsPovider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(
+          httpProxyProperties.getUserName(), httpProxyProperties.getPassword()));
+        builder.setDefaultCredentialsProvider(credentialsPovider);
+      }
+    }
+    return builder
+      .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
+      .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+      .build();
   }
 
 }

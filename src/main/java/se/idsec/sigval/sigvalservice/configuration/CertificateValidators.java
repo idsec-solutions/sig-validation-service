@@ -18,11 +18,15 @@ package se.idsec.sigval.sigvalservice.configuration;
 
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.HttpClient;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.openssl.PEMParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+
 import se.idsec.signservice.security.certificate.CertificateValidator;
 import se.swedenconnect.sigval.cert.chain.impl.StatusCheckingCertificateValidatorImpl;
 import se.swedenconnect.sigval.cert.validity.crl.CRLCache;
@@ -37,10 +41,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Configuration
+@Component
+@DependsOn("httpClientBean")
 public class CertificateValidators {
 
   private final CRLCache crlCache;
+  private final HttpClient httpClient;
   @Value("${sigval-service.cert-validator.sig.tsltrust-root:#{null}}") String sigTslTrustRoot;
   @Value("${sigval-service.cert-validator.sig.trusted-folder:#{null}}") String sigTrustFolder;
   @Value("${sigval-service.cert-validator.tsa.tsltrust-root:#{null}}") String tsaTslTrustRoot;
@@ -55,8 +61,9 @@ public class CertificateValidators {
   @Getter private List<X509Certificate> kidMatchCerts;
 
   @Autowired
-  public CertificateValidators(CRLCache crlCache) {
+  public CertificateValidators(CRLCache crlCache, HttpClient httpClient) {
     this.crlCache = crlCache;
+    this.httpClient = httpClient;
   }
 
   public void loadValidators() throws IOException, CertificateException {
@@ -73,7 +80,7 @@ public class CertificateValidators {
     CertStore certStore = null;
 
     if (tslTrustRoot != null) {
-      TslTrustCertStoreFactory ttCSFactory = new TslTrustCertStoreFactory(tslTrustRoot);
+      TslTrustCertStoreFactory ttCSFactory = new TslTrustCertStoreFactory(tslTrustRoot, httpClient);
       policyRoot = ttCSFactory.getPolicyRoot();
       certStore = ttCSFactory.getCertStore();
     }
