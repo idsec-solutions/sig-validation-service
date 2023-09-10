@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.6</version>
+        <version>2.7.14</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>se.idsec.sigval</groupId>
     <artifactId>sigval-service</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.2-SNAPSHOT</version>
     <name>sigval-service</name>
     <description>Demo project for Spring Boot</description>
 
@@ -61,7 +61,7 @@
             <dependency>
                 <groupId>se.idsec.signservice.commons</groupId>
                 <artifactId>signservice-bom</artifactId>
-                <version>1.2.1</version>
+                <version>1.2.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -128,27 +128,27 @@
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-pdf</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-xml</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-jose</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigvalreport</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.opensaml</groupId>
             <artifactId>opensaml-security-ext</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.opensaml</groupId>
@@ -161,7 +161,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>4.6.1</version>
+            <version>4.6.2</version>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>
@@ -171,7 +171,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
-            <version>3.6.0</version>
+            <version>3.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -191,7 +191,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
-            <version>6.1.0</version>
+            <version>6.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -201,7 +201,7 @@
         <dependency>
             <groupId>org.webjars.bower</groupId>
             <artifactId>bootstrap-fileinput</artifactId>
-            <version>5.2.5</version>
+            <version>5.5.2</version>
         </dependency>
     </dependencies>
 
