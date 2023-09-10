@@ -17,26 +17,36 @@
 package se.idsec.sigval.sigvalservice.configuration;
 
 import lombok.extern.log4j.Log4j2;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import se.idsec.sigval.sigvalservice.configuration.keys.KeySourceType;
+import se.idsec.sigval.sigvalservice.configuration.keys.PkiCredentialFactory;
+import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.sigval.cert.validity.crl.CRLCache;
 import se.swedenconnect.sigval.cert.validity.crl.impl.CRLCacheImpl;
-import se.idsec.sigval.sigvalservice.configuration.keys.LocalKeySource;
 import se.swedenconnect.sigval.svt.issuer.SVTModel;
-import se.swedenconnect.opensaml.pkcs11.PKCS11Provider;
-import se.swedenconnect.opensaml.pkcs11.PKCS11ProviderFactory;
-import se.swedenconnect.opensaml.pkcs11.configuration.PKCS11ProvidedCfgConfiguration;
-import se.swedenconnect.opensaml.pkcs11.configuration.PKCS11ProviderConfiguration;
-import se.swedenconnect.opensaml.pkcs11.configuration.PKCS11SoftHsmProviderConfiguration;
-import se.swedenconnect.opensaml.pkcs11.configuration.SoftHsmCredentialConfiguration;
 
 import java.io.File;
-import java.security.Provider;
-import java.security.Security;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Configuration
@@ -85,8 +95,29 @@ public class BeanConfig {
     return new FileSize(maxFileSize);
   }
 
+  /**
+   * Create the PKI Credential factory
+   *
+   * @param hsmExternalCfgLocations the locations of external PKCS11 configuration files
+   * @return {@link PkiCredentialFactory}
+   */
   @Bean
-  public Map<String, LocalKeySource> keySourceMap(
+  PkiCredentialFactory pkiCredentialFactory(
+    @Value("${sigval-service.pkcs11.external-config-locations:#{null}}") final List<String> hsmExternalCfgLocations) {
+
+    if (hsmExternalCfgLocations != null && hsmExternalCfgLocations.size() != 1) {
+      throw new RuntimeException("Only one PKCS11 config file is allowed");
+    }
+
+    final PkiCredentialFactory pkiCredentialFactory = new PkiCredentialFactory(
+      hsmExternalCfgLocations == null ? null : hsmExternalCfgLocations.get(0));
+    pkiCredentialFactory.setMockKeyLen(3072);
+    return pkiCredentialFactory;
+  }
+
+
+  @Bean
+  public Map<String, PkiCredential> pkiCredentialMap(
     @Value("${sigval-service.svt.keySourceType}")  String keySourceType,
     @Value("${sigval-service.svt.keySourceLocation}")  String keySourceLocation,
     @Value("${sigval-service.svt.keySourceCertLocation}")  String keySourceCertLocation,
@@ -97,96 +128,65 @@ public class BeanConfig {
     @Value("${sigval-service.report.keySourceCertLocation}")  String reportKeySourceCertLocation,
     @Value("${sigval-service.report.keySourceAlias}")  String reportKeySourceAlias,
     @Value("${sigval-service.report.keySourcePass}")  String reportKeySourcePass,
-    @Value("${sigval-service.pkcs11.reloadable-keys}") boolean pkcs11ReloadableKeys,
-    @Autowired PKCS11Provider pkcs11Provider
-  ){
+    @Autowired PkiCredentialFactory pkiCredentialFactory
+  ) throws Exception {
     log.info("SVT key source type: {}", keySourceType);
 
-    LocalKeySource svtKeySource = new LocalKeySource(keySourceType, keySourceLocation, keySourcePass,
-      keySourceAlias, keySourceCertLocation,pkcs11Provider, pkcs11ReloadableKeys);
-    LocalKeySource reportKeySource = new LocalKeySource(reportKeySourceType, reportKeySourceLocation, reportKeySourcePass,
-      reportKeySourceAlias, reportKeySourceCertLocation,pkcs11Provider, pkcs11ReloadableKeys);
+    Map<String, PkiCredential> credentialMap = new HashMap<>();
+    credentialMap.put("svt", getCredential(
+      pkiCredentialFactory,
+      keySourceType,
+      keySourceLocation,
+      keySourceCertLocation,
+      keySourceAlias,
+      keySourcePass));
 
-    Map<String, LocalKeySource> keySourceMap = new HashMap<>();
-    keySourceMap.put("svt", svtKeySource);
-    keySourceMap.put("report", reportKeySource);
-
-    return keySourceMap;
+    credentialMap.put("report", getCredential(
+      pkiCredentialFactory,
+      reportKeySourceType,
+      reportKeySourceLocation,
+      reportKeySourceCertLocation,
+      reportKeySourceAlias,
+      reportKeySourcePass));
+    return credentialMap;
   }
 
-  @Bean
-  PKCS11Provider pkcs11Provider(
-    @Value("${sigval-service.pkcs11.external-config-locations:#{null}}") String hsmExternalCfgLocations,
-    @Value("${sigval-service.pkcs11.lib:#{null}}") String hsmLib,
-    @Value("${sigval-service.pkcs11.name:#{null}}") String hsmProviderName,
-    @Value("${sigval-service.pkcs11.slot:#{null}}") String hsmSlot,
-    @Value("${sigval-service.pkcs11.slotListIndex:#{null}}") Integer hsmSlotListIndex,
-    @Value("${sigval-service.pkcs11.slotListIndexMaxRange:#{null}}") Integer hsmSlotListIndexMaxRange,
-    @Value("${sigval-service.pkcs11.softhsm.keylocation:#{null}}") String hsmKeyLocation,
-    @Value("${sigval-service.pkcs11.softhsm.pass:#{null}}") String hsmPin
+  private PkiCredential getCredential(PkiCredentialFactory pkiCredentialFactory, String keySourceType,
+    String keySourceLocation, String keySourceCertLocation, String keySourceAlias, String keySourcePass)
+    throws Exception {
+    File keySourceFile = StringUtils.isNotBlank(keySourceLocation) ? new File(keySourceLocation) : null;
+    File certificateFile = StringUtils.isNotBlank(keySourceCertLocation) ? new File(keySourceCertLocation) : null;
+    KeySourceType type = KeySourceType.valueOf(keySourceType);
+    char[] password = keySourcePass != null ? keySourcePass.toCharArray() : null;
+    return pkiCredentialFactory.getCredential(
+      type, keySourceFile, keySourceAlias, password, certificateFile);
+  }
 
-  ) throws Exception {
-    PKCS11ProviderConfiguration configuration;
-    if (hsmExternalCfgLocations != null) {
-      configuration = new PKCS11ProvidedCfgConfiguration(Collections.singletonList(hsmExternalCfgLocations));
-      log.info("Setting up PKCS11 configuration based on externally provided PKCS11 config files");
-    }
-    else {
-      if (hsmKeyLocation != null && hsmPin != null) {
-        PKCS11SoftHsmProviderConfiguration softHsmConfig = new PKCS11SoftHsmProviderConfiguration();
-        softHsmConfig.setCredentialConfigurationList(getCredentialConfiguration(hsmKeyLocation));
-        softHsmConfig.setPin(hsmPin);
-        configuration = softHsmConfig;
-        log.info("Setting up PKCS11 configuration based on SoftHSM");
+  @Bean(name = "httpClientBean")
+  HttpClient httpClient(HttpProxyProperties httpProxyProperties)
+    throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+
+    final HttpClientBuilder builder = HttpClientBuilder.create();
+    if (httpProxyProperties != null && httpProxyProperties.getHost() != null) {
+      final HttpHost proxy = new HttpHost(httpProxyProperties.getHost(), httpProxyProperties.getPort());
+      builder
+        .setProxy(proxy)
+        .setDefaultRequestConfig(RequestConfig.custom()
+          .setConnectTimeout(1000)
+          .setConnectionRequestTimeout(1000)
+          .setSocketTimeout(5000)
+          .build());
+      if (httpProxyProperties.getUserName() != null) {
+        CredentialsProvider credentialsPovider = new BasicCredentialsProvider();
+        credentialsPovider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(
+          httpProxyProperties.getUserName(), httpProxyProperties.getPassword()));
+        builder.setDefaultCredentialsProvider(credentialsPovider);
       }
-      else {
-        configuration = new PKCS11ProviderConfiguration();
-        log.info("Setting up generic PKCS11 configuration");
-      }
-      configuration.setLibrary(hsmLib);
-      configuration.setName(hsmProviderName);
-      configuration.setSlot(hsmSlot);
-      configuration.setSlotListIndex(hsmSlotListIndex);
-      configuration.setSlotListIndexMaxRange(hsmSlotListIndexMaxRange);
     }
-
-    PKCS11ProviderFactory factory = new PKCS11ProviderFactory(configuration, configString -> {
-      Provider sunPKCS11 = Security.getProvider("SunPKCS11");
-      // In Java 9+ the config string is either a file path (providing the config data) or the actual config data preceded with "--".
-      sunPKCS11 = sunPKCS11.configure("--" + configString);
-      return sunPKCS11;
-    });
-    return factory.createInstance();
-  }
-
-  private List<SoftHsmCredentialConfiguration> getCredentialConfiguration(String hsmKeyLocation) {
-    File keyDir = new File(hsmKeyLocation);
-    File[] files = keyDir.listFiles((dir, name) -> name.endsWith(".key") || name.endsWith(".crt"));
-    assert files != null;
-    List<File> keyList = Arrays.stream(files)
-      .filter(file -> file.getName().endsWith(".key"))
-      .collect(Collectors.toList());
-    List<String> certList = Arrays.stream(files)
-      .filter(file -> file.getName().endsWith(".crt"))
-      .filter(file -> isKeyMatch(file, keyList))
-      .map(file -> file.getName().substring(0, file.getName().length() - 4))
-      .collect(Collectors.toList());
-
-    List<SoftHsmCredentialConfiguration> credentialConfigurationList = new ArrayList<>();
-    certList.forEach(keyName -> {
-      SoftHsmCredentialConfiguration cc = new SoftHsmCredentialConfiguration();
-      cc.setName(keyName);
-      cc.setKeyLocation(new File(hsmKeyLocation, keyName + ".key").getAbsolutePath());
-      cc.setCertLocation(new File(hsmKeyLocation, keyName + ".crt").getAbsolutePath());
-      credentialConfigurationList.add(cc);
-    });
-    return credentialConfigurationList;
-  }
-
-  private boolean isKeyMatch(File file, List<File> keyList) {
-    String name = file.getName().substring(0, file.getName().length() - 4);
-    return keyList.stream()
-      .anyMatch(f -> f.getName().equalsIgnoreCase(name + ".key"));
+    return builder
+      .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
+      .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+      .build();
   }
 
 }
