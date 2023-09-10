@@ -11,10 +11,6 @@
 | 1.0.4   | Updated PDF context checking to allow legitimate changes to PDF documents afters signing                  | 2021-02-02 |
 | 1.1.0   | Support for JSON validation, ETSI 110 102-2 validation report and REST API for validation and SVT issuing | 2022-05-04 |
 
-## version 1.0.4
-This version introduces a new property in application.properties `sigval-service.validator.strict-pdf-context`.
-Setting this property to `true` means that the validator will not tolerate that the PDF document is updated through a re-save which may update the Document Security Store (DSS), metadata and document info. A setting to `false` will allow such chages after signing.
-
 ## version 1.1.0
 
 This version introduces new property settings in application.properties:
@@ -67,5 +63,9 @@ The following property settings are removed (no longer have any effect)
 sigval-service.ui.display-downloaded-svt-pdf
 sigval-service.ui.display-downloaded-svt-xml
 ```
+
+## version 1.0.4
+This version introduces a new property in application.properties `sigval-service.validator.strict-pdf-context`.
+Setting this property to `true` means that the validator will not tolerate that the PDF document is updated through a re-save which may update the Document Security Store (DSS), metadata and document info. A setting to `false` will allow such chages after signing.
 
 

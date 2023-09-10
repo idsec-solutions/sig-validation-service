@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.7</version>
+        <version>2.7.14</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>se.idsec.sigval</groupId>
@@ -180,28 +180,22 @@
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-pdf</artifactId>
-            <version>1.2.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15on</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-xml</artifactId>
-            <version>1.2.1</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-jose</artifactId>
-            <version>1.2.1</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigvalreport</artifactId>
-            <version>1.2.1</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.opensaml</groupId>
@@ -228,7 +222,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
-            <version>3.6.2</version>
+            <version>3.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -248,7 +242,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
-            <version>6.2.0</version>
+            <version>6.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -258,7 +252,7 @@
         <dependency>
             <groupId>org.webjars.bower</groupId>
             <artifactId>bootstrap-fileinput</artifactId>
-            <version>5.2.8</version>
+            <version>5.5.2</version>
         </dependency>
     </dependencies>
 
