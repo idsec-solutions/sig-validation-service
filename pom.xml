@@ -10,7 +10,7 @@
     </parent>
     <groupId>se.idsec.sigval</groupId>
     <artifactId>sigval-service</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <name>sigval-service</name>
     <description>Demo project for Spring Boot</description>
 
@@ -78,7 +78,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>jquery</artifactId>
-                <version>3.6.2</version>
+                <version>3.7.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -180,22 +180,22 @@
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-pdf</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-xml</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-jose</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigvalreport</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.opensaml</groupId>
@@ -222,7 +222,6 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
-            <version>3.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>

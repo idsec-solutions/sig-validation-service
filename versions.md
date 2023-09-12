@@ -10,6 +10,8 @@
 | 1.0.3   | Fxed chain_hash bug in svt lib                                                                            | 2020-10-23 |
 | 1.0.4   | Updated PDF context checking to allow legitimate changes to PDF documents afters signing                  | 2021-02-02 |
 | 1.1.0   | Support for JSON validation, ETSI 110 102-2 validation report and REST API for validation and SVT issuing | 2022-05-04 |
+| 1.2.0   | Move to use of Credential Support from Sweden Connect.                                                    | 2023-01-30 |
+| 1.2.1   | Updating signature validation base lib to 1.2.3                                                           | 2023-09-13 |
 
 ## version 1.1.0
 
