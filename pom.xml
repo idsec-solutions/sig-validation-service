@@ -5,17 +5,18 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.14</version>
+        <version>2.7.17</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>se.idsec.sigval</groupId>
     <artifactId>sigval-service</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.3</version>
     <name>sigval-service</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>11</java.version>
+        <signature-validation.version>1.2.4</signature-validation.version>
     </properties>
 
     <repositories>
@@ -93,19 +94,23 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.72</version>
+                <version>1.76</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>1.72</version>
+                <version>1.76</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcutil-jdk18on</artifactId>
-                <version>1.72</version>
+                <version>1.76</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.30</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
@@ -180,22 +185,22 @@
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-pdf</artifactId>
-            <version>1.2.3</version>
+            <version>${signature-validation.version}</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-xml</artifactId>
-            <version>1.2.3</version>
+            <version>${signature-validation.version}</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigval-jose</artifactId>
-            <version>1.2.3</version>
+            <version>${signature-validation.version}</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.sigval</groupId>
             <artifactId>sigvalreport</artifactId>
-            <version>1.2.3</version>
+            <version>${signature-validation.version}</version>
         </dependency>
         <dependency>
             <groupId>se.swedenconnect.opensaml</groupId>
