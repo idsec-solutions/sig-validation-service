@@ -57,9 +57,7 @@ This application supports validation of the following signature formats:
 
 ## Archiving support
 
-This service use the open source implementation of Signature Validation Tokens, currently under publication by the Internet Engineering Task force.
-
-Current draft: [https://datatracker.ietf.org/doc/draft-santesson-svt](https://datatracker.ietf.org/doc/draft-santesson-svt)
+This service use the open source implementation of Signature Validation Tokens defined by RFC 9321 [https://datatracker.ietf.org/doc/rfc9321/](https://datatracker.ietf.org/doc/rfc9321/)
 
 The SVT is tool for preservation and archival of validation result. This means that the SVT is a simple format to store and archive a validation result as a result of a signature validation process. The signature validation result is bound to the signed document and the validated signature in a way that allows the signature validation result to be validated against the signed document into a distant future, allowing the signed document to be archived for a very long time where the signature validation result is preserved along with the signed document.
 
@@ -102,6 +100,42 @@ issued by this service.
 |------------------|------------------------------------------------------------------------------------------------------------------------------------------|
 | `name`           | The name of the document used when returning the svt enhanced signed document                                                            |
 | `replace`        | Value `true` causes any existing SVT in the document to be replaced with a new SVT. Default = `false` (Add this SVT to any existing SVT) |
+
+## Service credential configuration
+
+Key configuration for keys used to issue SVT and validation reports supports the following types:
+
+| Key type | Key source                                                                  |
+|----------|-----------------------------------------------------------------------------|
+| `jks`    | Keys stored in a Java key store file.                                       |
+| `pkcs12` | Keys stored in a PKCS#12 key store file.                                    |
+| `pkcs11` | The private key is stored in an external HSM device accessed using PKCS#11. |
+| `pem`    | Private and public key are provided in separate PEM files.                  |
+| `create` | Create a new key at every startup (for test only)                           |
+| `none`   | no key                                                                      |
+
+The details of the credential specified by key type is specified using the following property prefixes:
+
+| Property prefix       | credential                                           |
+|-----------------------|------------------------------------------------------|
+| sigval-service.svt    | SVT issuance credential configuration                |
+| sigval-service.report | Signature validation report credential configuration |
+
+The following properties can be set:
+
+| Property              | Definition                                                              |
+|-----------------------|-------------------------------------------------------------------------|
+| keySourceType         | Key type as specified above                                             |
+| keySourceLocation     | Location of the key (empty for PKCS#11)                                 |
+| keySourcePass         | Passwrod/Pin for accessing the key                                      |
+| keySourceAlias        | Key alias within the key soruce                                         |
+| keySourceCertLocation | Certificate file location. Must be provided for `pkcs11` and `pem` only |
+
+If any of the keys are of type `pkcs11` the following property must also be set:
+
+> sigval-service.pkcs11.external-config-locations
+
+The value of this property is the location of a PKCS11 provider configuration file (See Java documentation for content description).
 
 ## Demo deployment
 
