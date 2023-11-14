@@ -21,5 +21,11 @@ function selectLang(lang, currentLang, destination){
     if (lang === currentLang){
         return;
     }
+
+    // Dirty input validation fix, assumes only languages are sv and en
+    if (lang !== "sv" && lang !== "en"){
+	return;
+    }
+
     window.location=destination;
 }
