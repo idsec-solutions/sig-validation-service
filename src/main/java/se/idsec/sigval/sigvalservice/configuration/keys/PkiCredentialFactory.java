@@ -73,9 +73,13 @@ public class PkiCredentialFactory {
 
     Provider createdPkcs11Provider = null;
     if (pkcs11ConfigFilePath != null) {
+      log.info("Setting up PkiCredentialFactory without PKCS#11 provider using pkcs11 config file at: {}", pkcs11ConfigFilePath);
       createdPkcs11Provider = Security.getProvider("SunPKCS11");
       createdPkcs11Provider = createdPkcs11Provider.configure(pkcs11ConfigFilePath);
       Security.addProvider(createdPkcs11Provider);
+      log.info("PKCS#11 provider successfully created with name {}", createdPkcs11Provider.getName());
+    } else {
+      log.info("Setting up PkiCredentialFactory without PKCS#11 provider");
     }
     this.pkcs11Provider = createdPkcs11Provider;
   }
@@ -110,6 +114,10 @@ public class PkiCredentialFactory {
           null, "PKCS11", this.pkcs11Provider.getName(),
           password, alias, null);
       p11Credential.init();
+      log.trace("Initially loaded key credential certificate:\n{}", p11Credential.getCertificate());
+      X509Certificate p11Certificate = CertUtil.readCertificate(certificateFile);
+      log.trace("Replaced with configured certificate:\n{}", p11Certificate);
+      p11Credential.setCertificate(p11Certificate);
       return p11Credential;
     case pem:
       Objects.requireNonNull(keySourceLocation, "Key source location must not be null for pem key sources");

@@ -154,12 +154,15 @@ public class BeanConfig {
   private PkiCredential getCredential(PkiCredentialFactory pkiCredentialFactory, String keySourceType,
     String keySourceLocation, String keySourceCertLocation, String keySourceAlias, String keySourcePass)
     throws Exception {
+    log.debug("Loading credential: type {}, location {}, certLocation {}, alias {}", keySourceType, keySourceLocation, keySourceCertLocation, keySourceAlias);
     File keySourceFile = StringUtils.isNotBlank(keySourceLocation) ? new File(keySourceLocation) : null;
     File certificateFile = StringUtils.isNotBlank(keySourceCertLocation) ? new File(keySourceCertLocation) : null;
     KeySourceType type = KeySourceType.valueOf(keySourceType);
     char[] password = keySourcePass != null ? keySourcePass.toCharArray() : null;
-    return pkiCredentialFactory.getCredential(
+    PkiCredential credential = pkiCredentialFactory.getCredential(
       type, keySourceFile, keySourceAlias, password, certificateFile);
+    log.debug("Setup credential with certificate\n{}", credential.getCertificate());
+    return credential;
   }
 
   @Bean(name = "httpClientBean")
