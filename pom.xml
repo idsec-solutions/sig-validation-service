@@ -10,13 +10,13 @@
     </parent>
     <groupId>se.idsec.sigval</groupId>
     <artifactId>sigval-service</artifactId>
-    <version>1.2.4</version>
+    <version>1.2.5</version>
     <name>sigval-service</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>11</java.version>
-        <signature-validation.version>1.2.4</signature-validation.version>
+        <signature-validation.version>1.2.5</signature-validation.version>
     </properties>
 
     <repositories>
