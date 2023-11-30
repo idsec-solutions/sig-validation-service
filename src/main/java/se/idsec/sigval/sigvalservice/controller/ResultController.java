@@ -52,6 +52,8 @@ public class ResultController {
   @Value("${sigval-service.ui.show-loa}") boolean showLoa;
   @Value("${sigval-service.svt.issuer-enabled}") boolean enableSvtIssuer;
   @Value("${sigval-service.ui.show-report-options}") boolean showReportOptions;
+  @Value("${sigval-service.svt.new-svt-tab:true}") boolean newSvtTab;
+
 
   private final UIText uiText;
   private final HttpSession httpSession;
@@ -119,6 +121,7 @@ public class ResultController {
     model.addAttribute("svtAvailable", (svtAvailable || issueSvtIfExists) && enableSvtIssuer);
     model.addAttribute("enableSignedDataView", enableSignedDataView);
     model.addAttribute("showReportOptions", showReportOptions);
+    model.addAttribute("newSvtTab", newSvtTab);
 
     return "sigvalresult";
   }

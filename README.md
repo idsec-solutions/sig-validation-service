@@ -57,9 +57,10 @@ This application supports validation of the following signature formats:
 
 ## Archiving support
 
-This service use the open source implementation of Signature Validation Tokens defined by RFC 9321 [https://datatracker.ietf.org/doc/rfc9321/](https://datatracker.ietf.org/doc/rfc9321/)
+This service uses the open-source implementation of Signature Validation Tokens defined by RFC 9321 [https://datatracker.ietf.org/doc/rfc9321/](https://datatracker.ietf.org/doc/rfc9321/)
 
-The SVT is tool for preservation and archival of validation result. This means that the SVT is a simple format to store and archive a validation result as a result of a signature validation process. The signature validation result is bound to the signed document and the validated signature in a way that allows the signature validation result to be validated against the signed document into a distant future, allowing the signed document to be archived for a very long time where the signature validation result is preserved along with the signed document.
+The SVT is a tool for preservation and archival of validation results. 
+This means that the SVT is a simple format to store and archive a validation result as a result of a signature validation process. The signature validation result is bound to the signed document and the validated signature in a way that allows the signature validation result to be validated against the signed document into a distant future, allowing the signed document to be archived for a very long time where the signature validation result is preserved along with the signed document.
 
 The SVT is a complementary technology to various solutions used to validate signatures, including complex solutions for validation of old signatures. Once the validation solution has been used to validate the signature, then that validation result can be preserved using SVT.
 
@@ -85,7 +86,7 @@ according to ETSI TS 119 102-2
 
 ### SVT issuance REST API
 
-This REST API allows an external service to upload a signed document (XML, PDF of JOSE) for validation and returns the same document enhanced with an SVT
+This REST API allows an external service to upload a signed document (XML, PDF of JOSE) for validation and return the same document enhanced with an SVT
 issued by this service.
 
 | Property     | value                                                                        |
@@ -114,7 +115,7 @@ Key configuration for keys used to issue SVT and validation reports supports the
 | `create` | Create a new key at every startup (for test only)                           |
 | `none`   | no key                                                                      |
 
-The details of the credential specified by key type is specified using the following property prefixes:
+The details of the credential specified by key type are specified using the following property prefixes:
 
 | Property prefix       | credential                                           |
 |-----------------------|------------------------------------------------------|

@@ -52,6 +52,7 @@ public class SVTIssuanceController {
   @Value("${sigval-service.svt.issuer-enabled}") boolean enableSvtIssuer;
   @Value("${sigval-service.svt.default-replace}") boolean defaultReplaceSvt;
   @Value("${sigval-service.ui.downloaded-svt-suffix}") String svtSuffix;
+  @Value("${sigval-service.svt.download-attachment:true}") boolean svtAsAttachment;
 
   private final HttpSession httpSession;
   private final SignatureValidatorProvider signatureValidatorProvider;
@@ -70,7 +71,7 @@ public class SVTIssuanceController {
     @RequestParam(name = "replace", required = false) String replace) throws IOException, RuntimeException {
     byte[] documentBytes = (byte[]) httpSession.getAttribute(SessionAttr.signedDoc.name());
     String name = (String) httpSession.getAttribute(SessionAttr.docName.name());
-    return issueSvtFunction(documentBytes, name, replace);
+    return issueSvtFunction(documentBytes, name, replace, svtAsAttachment);
   }
 
   @RequestMapping(value = "/issue-svt", method = RequestMethod.POST)
@@ -81,11 +82,11 @@ public class SVTIssuanceController {
     byte[] documentBytes = postedDocumentStream == null
       ? null
       : IOUtils.toByteArray(postedDocumentStream);
-    return issueSvtFunction(documentBytes, name, replace);
+    return issueSvtFunction(documentBytes, name, replace, false);
   }
 
   public ResponseEntity<InputStreamResource> issueSvtFunction(byte[] documentBytes,
-    String name, String replace) throws IOException, RuntimeException {
+    String name, String replace, boolean attachment) throws IOException, RuntimeException {
 
     if (documentBytes == null) {
       log.debug("Bad request - no document provided in the request");
@@ -160,20 +161,22 @@ public class SVTIssuanceController {
 
     return ResponseEntity
       .ok()
-      .headers(getHeaders(fileName))
+      .headers(getHeaders(fileName, attachment))
       .contentLength(svtEnhancedDocument.length)
       .contentType(mediaType)
       .body(new InputStreamResource(new ByteArrayInputStream(svtEnhancedDocument)));
   }
 
-  private HttpHeaders getHeaders(String fileName) {
+  private HttpHeaders getHeaders(String fileName, boolean attachment) {
+    String contentDispHeaderVal = attachment ? "attachment; filename=" : "inline; filename=";
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-    headers.add("Content-disposition", "inline; filename=" + fileName);
+    headers.add("content-disposition", contentDispHeaderVal + fileName);
     headers.add("Pragma", "no-cache");
     headers.add("Expires", "0");
     return headers;
   }
+
 
   private String getSvtFileName(String fileName, MediaType tbsType) {
 

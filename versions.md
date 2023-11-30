@@ -1,6 +1,6 @@
 # Signature Validation Service versions
 
-**Latest Current version: 1.1.0**
+**Latest Current version: 1.2.6**
 
 | Version | Comment                                                                                                   | Date       |
 |---------|-----------------------------------------------------------------------------------------------------------|------------|
@@ -12,6 +12,26 @@
 | 1.1.0   | Support for JSON validation, ETSI 110 102-2 validation report and REST API for validation and SVT issuing | 2022-05-04 |
 | 1.2.0   | Move to use of Credential Support from Sweden Connect.                                                    | 2023-01-30 |
 | 1.2.1   | Updating signature validation base lib to 1.2.3                                                           | 2023-09-13 |
+| 1.2.3   | Updating signature validation base lib to 1.2.4                                                           | 2023-10-25 |
+| 1.2.4   | Fix HSM certificate loading                                                                               | 2023-11-21 |
+| 1.2.5   | Fix XML parsing bug of time not expressed in CET                                                          | 2023-11-22 |
+| 1.2.6   | Configuration options for inline or attached SVT in web UI                                                | 2023-09-13 |
+
+
+## version 1.2.6
+
+This version includes two new configuration settings for delivery of SVT as an inline document or as an attachment.
+
+```
+sigval-service.svt.download-attachment=true
+sigval-service.svt.new-svt-tab=true
+```
+
+These are the default settings of the property parameters. `download-attachment` set to `true` causes the SVT document to be downloaded
+and saved to disk. The value of `false` causes the document to be shown in the browser.
+`new-svt-tab` set to `true` opens a new tab for returning the svt document. Setting this to `false` returns the document in the current tab.
+
+
 
 ## version 1.1.0
 

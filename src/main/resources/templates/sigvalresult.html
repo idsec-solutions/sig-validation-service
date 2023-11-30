@@ -101,7 +101,7 @@
             </table>
             <button th:if="${resultPageData.getStatus().name().equalsIgnoreCase('ok') && svtAvailable}"
                     class="btn btn-sm btn-outline-dark" style="height: 25px; padding-top: 1px; padding-bottom: 1px; margin-bottom: 10px"
-                    th:onclick="'downloadSvt()'"
+                    th:onclick="'downloadSvt(' + ${newSvtTab} + ')'"
                     th:text="${text.getString('getSvt')}"></button>&nbsp;&nbsp;&nbsp;
 
             <!-- Display each signature -->

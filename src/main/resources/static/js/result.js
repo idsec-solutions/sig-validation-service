@@ -32,9 +32,13 @@ $(document).ready(function () {
 
 });
 
-function downloadSvt(){
-    let win = window.open("issue-svt-internal", "_blank");
-    win.focus()
+function downloadSvt(newTab){
+    if (newTab) {
+        let win = window.open("issue-svt-internal", "_blank");
+        win.focus()
+    } else {
+        window.location = "issue-svt-internal";
+    }
 }
 
 function getValidationReport(){
