@@ -128,8 +128,8 @@ The following properties can be set:
 |-----------------------|-------------------------------------------------------------------------|
 | keySourceType         | Key type as specified above                                             |
 | keySourceLocation     | Location of the key (empty for PKCS#11)                                 |
-| keySourcePass         | Passwrod/Pin for accessing the key                                      |
-| keySourceAlias        | Key alias within the key soruce                                         |
+| keySourcePass         | Password/Pin for accessing the key                                      |
+| keySourceAlias        | Key alias within the key source                                         |
 | keySourceCertLocation | Certificate file location. Must be provided for `pkcs11` and `pem` only |
 
 If any of the keys are of type `pkcs11` the following property must also be set:
