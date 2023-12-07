@@ -64,6 +64,8 @@ public class MainController {
     model.addAttribute("lang", lang);
     model.addAttribute("text", uiText.getBundle(UIText.UiBundle.resultText, lang));
     model.addAttribute("maxFileSizeKb", maxFileSize.getKbValue());
+    model.addAttribute("initialCaption", uiText.getBundle(UIText.UiBundle.infoText, lang).getString("initialCaption"));
+    model.addAttribute("validateButtonText", uiText.getBundle(UIText.UiBundle.infoText, lang).getString("validateButtonText"));
 
     return "sigval";
   }

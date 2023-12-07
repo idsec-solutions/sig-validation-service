@@ -30,9 +30,9 @@
     <div class="card" style="margin-top: 10px">
         <div class="card-header" style="text-align: center">
             <h2>
-                <img align="left" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
+                <img style="float: left" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
                 <span th:if="${basicModel.isDevmode()}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
-                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" align='right' th:src="${basicModel.getSecondaryLogoUrl()}" alt='Logo' height='50'>
+                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" style="float: right" th:src="${basicModel.getSecondaryLogoUrl()}" alt='Logo' height='50'>
             </h2>
         </div>
         <div class="card-body">
