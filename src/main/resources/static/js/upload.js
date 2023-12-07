@@ -23,7 +23,9 @@ $(document).ready(function () {
         maxFileSize: maxFileSizeKb,
         maxFileCount: 1,
         language: lang,
-        elErrorContainer: '#kv-error-2'
+        elErrorContainer: '#kv-error-2',
+        uploadLabel: validateButtonText,
+        initialCaption: initialCaption
     }).on('filebatchpreupload', function (event, data, id, index) {
         $('#kv-success-2').html('<h4>Upload Status</h4><ul></ul>').hide();
     }).on('filebatchuploadsuccess', function (event, data) {
