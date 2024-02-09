@@ -1,6 +1,6 @@
 # Signature Validation Service versions
 
-**Latest Current version: 1.2.7**
+**Latest Current version: 1.2.8**
 
 | Version | Comment                                                                                                   | Date       |
 |---------|-----------------------------------------------------------------------------------------------------------|------------|
@@ -16,10 +16,11 @@
 | 1.2.4   | Fix HSM certificate loading                                                                               | 2023-11-21 |
 | 1.2.5   | Fix XML parsing bug of time not expressed in CET                                                          | 2023-11-22 |
 | 1.2.6   | Configuration options for inline or attached SVT in web UI                                                | 2023-09-13 |
-| 1.2.7   | Corrected display of validation result with SVT                                                           | 2024-02-09 |
+| 1.2.7   | UI updates                                                                                                | 2023-12-11 |
+| 1.2.8   | Corrected display of validation result with SVT                                                           | 2024-02-09 |
 
 
-## version 1.2.7
+## version 1.2.8
 
 This version adds a new configuration option in `application.properties`
 
