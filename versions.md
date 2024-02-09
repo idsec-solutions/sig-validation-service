@@ -1,13 +1,13 @@
 # Signature Validation Service versions
 
-**Latest Current version: 1.2.6**
+**Latest Current version: 1.2.7**
 
 | Version | Comment                                                                                                   | Date       |
 |---------|-----------------------------------------------------------------------------------------------------------|------------|
 | 1.0.0   | Initial release                                                                                           | 2020-10-01 |
 | 1.0.1   | Support for signature validation date limit                                                               | 2020-10-02 |
 | 1.0.2   | Fixed file size issue                                                                                     | 2020-10-06 |
-| 1.0.3   | Fxed chain_hash bug in svt lib                                                                            | 2020-10-23 |
+| 1.0.3   | Fixed chain_hash bug in svt lib                                                                           | 2020-10-23 |
 | 1.0.4   | Updated PDF context checking to allow legitimate changes to PDF documents afters signing                  | 2021-02-02 |
 | 1.1.0   | Support for JSON validation, ETSI 110 102-2 validation report and REST API for validation and SVT issuing | 2022-05-04 |
 | 1.2.0   | Move to use of Credential Support from Sweden Connect.                                                    | 2023-01-30 |
@@ -16,7 +16,24 @@
 | 1.2.4   | Fix HSM certificate loading                                                                               | 2023-11-21 |
 | 1.2.5   | Fix XML parsing bug of time not expressed in CET                                                          | 2023-11-22 |
 | 1.2.6   | Configuration options for inline or attached SVT in web UI                                                | 2023-09-13 |
+| 1.2.7   | Corrected display of validation result with SVT                                                           | 2024-02-09 |
 
+
+## version 1.2.7
+
+This version adds a new configuration option in `application.properties`
+
+> sigval-service.svt.issue-on-failed-validation=false
+
+If not set, this property defaults to the value `false`.
+If this is the preferred choice, 
+no changes to configuration are necessary from previous versions.
+
+When this property is set to `false`,
+the validation service will not issue an SVT enhanced document unless all signatures on the document validates successfully.
+
+Setting this option to `true` will allow the validation service to issue an SVT if possible, regardless of validation result.
+Note that if validation was not successful, the SVT will indicate that the validation was not successful, but it will still be issued.
 
 ## version 1.2.6
 
