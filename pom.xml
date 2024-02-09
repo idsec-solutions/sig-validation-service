@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <signature-validation.version>1.2.6</signature-validation.version>
+        <signature-validation.version>1.2.7</signature-validation.version>
     </properties>
 
     <repositories>

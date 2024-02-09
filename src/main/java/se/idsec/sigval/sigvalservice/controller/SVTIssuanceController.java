@@ -16,8 +16,14 @@
 
 package se.idsec.sigval.sigvalservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
@@ -33,17 +39,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.w3c.dom.Document;
+
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 import se.swedenconnect.sigval.commons.document.DocType;
 import se.swedenconnect.sigval.commons.svt.SVTExtendpolicy;
+import se.swedenconnect.sigval.commons.svt.SVTUtils;
 import se.swedenconnect.sigval.pdf.timestamp.issue.impl.PDFDocTimstampProcessor;
+import se.swedenconnect.sigval.svt.claims.SVTClaims;
+import se.swedenconnect.sigval.svt.claims.ValidationConclusion;
 import se.swedenconnect.sigval.svt.issuer.SVTModel;
 import se.swedenconnect.sigval.xml.utils.XMLDocumentBuilder;
 
 import javax.servlet.http.HttpSession;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 
 @RestController
 @Slf4j
@@ -53,17 +66,20 @@ public class SVTIssuanceController {
   @Value("${sigval-service.svt.default-replace}") boolean defaultReplaceSvt;
   @Value("${sigval-service.ui.downloaded-svt-suffix}") String svtSuffix;
   @Value("${sigval-service.svt.download-attachment:true}") boolean svtAsAttachment;
+  @Value("${sigval-service.svt.issue-on-failed-validation:false}") boolean issueSvtOnFailedValidation;
 
   private final HttpSession httpSession;
   private final SignatureValidatorProvider signatureValidatorProvider;
   private final SVTModel svtModel;
+  private final ObjectMapper objectMapper;
 
   @Autowired
   public SVTIssuanceController(HttpSession httpSession,
-    SignatureValidatorProvider signatureValidatorProvider, SVTModel svtModel) {
+    SignatureValidatorProvider signatureValidatorProvider, SVTModel svtModel, ObjectMapper objectMapper) {
     this.httpSession = httpSession;
     this.signatureValidatorProvider = signatureValidatorProvider;
     this.svtModel = svtModel;
+    this.objectMapper = objectMapper;
   }
 
   @RequestMapping("/issue-svt-internal")
@@ -78,11 +94,20 @@ public class SVTIssuanceController {
   public ResponseEntity<InputStreamResource> issueSvtApi(
     InputStream postedDocumentStream,
     @RequestParam(name = "name", required = false) String name,
-    @RequestParam(name = "replace", required = false) String replace) throws IOException, RuntimeException {
-    byte[] documentBytes = postedDocumentStream == null
-      ? null
-      : IOUtils.toByteArray(postedDocumentStream);
-    return issueSvtFunction(documentBytes, name, replace, false);
+    @RequestParam(name = "replace", required = false) String replace) {
+    try {
+      byte[] documentBytes = postedDocumentStream == null
+        ? null
+        : IOUtils.toByteArray(postedDocumentStream);
+      return issueSvtFunction(documentBytes, name, replace, false);
+    }
+    catch (IOException e) {
+      return ResponseEntity
+        .badRequest()
+        .body(new InputStreamResource(new ByteArrayInputStream(
+          e.getMessage().getBytes(StandardCharsets.UTF_8)
+        )));
+    }
   }
 
   public ResponseEntity<InputStreamResource> issueSvtFunction(byte[] documentBytes,
@@ -94,11 +119,12 @@ public class SVTIssuanceController {
     }
 
     SVTExtendpolicy svtExtendpolicy;
-    if (StringUtils.isNotBlank(replace)){
+    if (StringUtils.isNotBlank(replace)) {
       svtExtendpolicy = replace.equalsIgnoreCase("true")
         ? SVTExtendpolicy.REPLACE
         : SVTExtendpolicy.EXTEND;
-    } else {
+    }
+    else {
       svtExtendpolicy = defaultReplaceSvt
         ? SVTExtendpolicy.REPLACE
         : SVTExtendpolicy.EXTEND;
@@ -107,13 +133,14 @@ public class SVTIssuanceController {
     byte[] svtEnhancedDocument;
     MediaType mediaType;
 
-    // Generate report based on document type
+    // Generate a report based on document type
     DocType docType = DocType.getDocType(documentBytes);
     switch (docType) {
     case XML:
       try {
         Document xmlDocument = XMLDocumentBuilder.getDocument(documentBytes);
-        svtEnhancedDocument = signatureValidatorProvider.getXmlDocumentSVTIssuer().issueSvt(xmlDocument, svtModel, svtExtendpolicy);
+        svtEnhancedDocument = signatureValidatorProvider.getXmlDocumentSVTIssuer()
+          .issueSvt(xmlDocument, svtModel, svtExtendpolicy, issueSvtOnFailedValidation);
         mediaType = MediaType.TEXT_XML;
       }
       catch (Exception ex) {
@@ -123,7 +150,11 @@ public class SVTIssuanceController {
       break;
     case PDF:
       try {
-        SignedJWT signedSvtJWT = signatureValidatorProvider.getPdfsvtSigValClaimsIssuer().getSignedSvtJWT(documentBytes, svtModel);
+        SignedJWT signedSvtJWT = signatureValidatorProvider.getPdfsvtSigValClaimsIssuer()
+          .getSignedSvtJWT(documentBytes, svtModel);
+        if (!SVTUtils.checkIfSVTShouldBeIssued(signedSvtJWT, issueSvtOnFailedValidation)) {
+          throw new IOException("SVT request for document with invalid signatures");
+        }
         PDFDocTimstampProcessor.Result result = PDFDocTimstampProcessor.createSVTSealedPDF(
           documentBytes, signedSvtJWT.serialize(), signatureValidatorProvider.getSvtTsSigner());
         svtEnhancedDocument = result.getDocument();
@@ -137,7 +168,8 @@ public class SVTIssuanceController {
     case JOSE:
     case JOSE_COMPACT:
       try {
-        svtEnhancedDocument = signatureValidatorProvider.getJoseDocumentSVTIssuer().issueSvt(documentBytes, svtModel, svtExtendpolicy);
+        svtEnhancedDocument = signatureValidatorProvider.getJoseDocumentSVTIssuer()
+          .issueSvt(documentBytes, svtModel, svtExtendpolicy, issueSvtOnFailedValidation);
         mediaType = MediaType.APPLICATION_JSON;
       }
       catch (Exception ex) {
@@ -176,7 +208,6 @@ public class SVTIssuanceController {
     headers.add("Expires", "0");
     return headers;
   }
-
 
   private String getSvtFileName(String fileName, MediaType tbsType) {
 

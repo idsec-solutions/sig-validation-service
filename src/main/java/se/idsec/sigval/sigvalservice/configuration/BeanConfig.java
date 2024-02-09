@@ -48,6 +48,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Log4j2
 @Configuration
 public class BeanConfig {
@@ -190,6 +192,10 @@ public class BeanConfig {
       .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
       .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
       .build();
+  }
+
+  @Bean ObjectMapper objectMapper() {
+    return new ObjectMapper();
   }
 
 }
