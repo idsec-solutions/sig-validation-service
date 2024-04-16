@@ -19,6 +19,7 @@ package se.idsec.sigval.sigvalservice.result;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
@@ -51,12 +52,20 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ResultPageDataGenerator {
 
+  private final List<String> attributeDisplayBlacklist;
+
+  private final List<String> loaAcrBlacklist;
+
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
 
   private final UIText uiText;
 
   @Autowired
-  public ResultPageDataGenerator(UIText uiText) {
+  public ResultPageDataGenerator(UIText uiText,
+    @Value("${sigval-service.ui.hide-attribute:}") String[] attributeDisplayBlacklistArray,
+    @Value("${sigval-service.ui.hide-loa-uri:}") String[] loaAcrBlacklistArray) {
+    this.attributeDisplayBlacklist = Arrays.asList(attributeDisplayBlacklistArray);
+    this.loaAcrBlacklist = Arrays.asList(loaAcrBlacklistArray);
     this.uiText = uiText;
   }
 
@@ -250,10 +259,10 @@ public class ResultPageDataGenerator {
       builder
         .assertionRef(authContextInfo.getAssertionRef())
         .idp(authContextInfo.getIdentityProvider())
-        .loa(authContextInfo.getAuthnContextClassRef())
+        .loa(getDisplayLoa(authContextInfo.getAuthnContextClassRef(), loaAcrBlacklist))
         .signingTime(dateFormat.format(Date.from(authContextInfo.getAuthenticationInstant())))
         .serviceProvider(authContextInfo.getServiceID());
-      List<DisplayAttribute> displayAttributes = getAttrsFromAuthContextExt(authContextExtData, lang);
+      List<DisplayAttribute> displayAttributes = getAttrsFromAuthContextExt(authContextExtData, lang, signerCertificate);
       builder.signerAttribute(displayAttributes);
       return;
     }
@@ -264,15 +273,36 @@ public class ResultPageDataGenerator {
     builder.signerAttribute(displayAttributes);
   }
 
-  private List<DisplayAttribute> getAttrsFromAuthContextExt(SAMLAuthContext authContextExtData, String lang) {
+  private String getDisplayLoa(String authnContextClassRef, List<String> loaAcrBlacklist) {
+    if (authnContextClassRef == null) {
+      return null;
+    }
+    if (loaAcrBlacklist.contains(authnContextClassRef)){
+      return null;
+    }
+    return authnContextClassRef;
+  }
+
+  private List<DisplayAttribute> getAttrsFromAuthContextExt(SAMLAuthContext authContextExtData, String lang, X509Certificate signCert) {
     if (authContextExtData == null) return new ArrayList<>();
     try {
       List<AttributeMapping> attributeMappings = authContextExtData.getIdAttributes().getAttributeMappings();
       return attributeMappings.stream()
+        .filter(attributeMapping ->
+          attributeMapping.getType().equals(AttributeMapping.Type.san) ||
+          !attributeDisplayBlacklist.contains(attributeMapping.getRef()))
         .map(attributeMapping -> {
+          String certAttrValue = null;
+          try {
+            certAttrValue = CertUtils.getReferencedAttributeValue(signCert, attributeMapping.getType(), attributeMapping.getRef());
+          }
+          catch (IOException e) {
+            log.debug("Referenced attribute of type {} and ref {} is not present in the certificate", attributeMapping.getType(), attributeMapping.getRef());
+            throw new IllegalArgumentException("Attributes in AuthnContextExtension are not supported by the certificate");
+          }
           Attribute attribute = attributeMapping.getAttribute();
           SamlAttribute samlAttr = SamlAttribute.getAttributeFromSamlName(attribute.getName());
-          String attributeValue =getAttrValueString(attribute);
+          String attributeValue = getAttrValueString(attribute, certAttrValue);
           return getDispalyAttribute(attribute, uiText.getBundle(UIText.UiBundle.samlAttr, lang), samlAttr, attributeValue);
         })
         .sorted(Comparator.comparingInt(DisplayAttribute::getOrder))
@@ -292,9 +322,11 @@ public class ResultPageDataGenerator {
     return new DisplayAttribute(attribute.getFriendlyName(), attributeValue, 99);
   }
 
-  private String getAttrValueString(Attribute samlAttr) {
-    if (samlAttr.getAttributeValues() == null || samlAttr.getAttributeValues().size() ==0){
-      return "";
+  private String getAttrValueString(Attribute samlAttr, String certValue) {
+    if (samlAttr.getAttributeValues() == null || samlAttr.getAttributeValues().isEmpty()){
+      if (certValue != null) {
+        return certValue;
+      }
     }
     Object valueObject = samlAttr.getAttributeValues().get(0);
     if (valueObject instanceof Element){
@@ -310,6 +342,7 @@ public class ResultPageDataGenerator {
     try {
       Map<SubjectDnAttribute, String> subjectAttributes = CertUtils.getSubjectAttributes(signCert);
       return subjectAttributes.keySet().stream()
+        .filter(subjectDnAttribute -> !attributeDisplayBlacklist.contains(subjectDnAttribute.getOid()))
         .map(subjectDnAttribute -> {
           String name = subjectDnAttribute.equals(SubjectDnAttribute.unknown)
             ? subjectDnAttribute.getOid()
