@@ -1,6 +1,6 @@
 # Signature Validation Service versions
 
-**Latest Current version: 1.2.8**
+**Latest Current version: 1.2.9**
 
 | Version | Comment                                                                                                   | Date       |
 |---------|-----------------------------------------------------------------------------------------------------------|------------|
@@ -18,6 +18,31 @@
 | 1.2.6   | Configuration options for inline or attached SVT in web UI                                                | 2023-09-13 |
 | 1.2.7   | UI updates                                                                                                | 2023-12-11 |
 | 1.2.8   | Corrected display of validation result with SVT                                                           | 2024-02-09 |
+| 1.2.9   | Corrected display of authentication LoA level                                                             | 2024-04-16 |
+
+
+## version 1.2.8
+
+This version adds two new configuration options in `application.properties`
+
+> sigval-service.ui.hide-attribute
+
+and 
+
+> sigval-service.ui.hide-loa-uri
+
+The `sigval-service.ui.hide-attribute` property holds an optional comma-separated list of certificate attribute OID:s.
+Any OID found in this list will not be displayed as an ID attribute of the user.
+This option is intended
+to be used when the certificate subject name contains attributes that are not representing the identity of the subject,
+such as if an attribute holding the "level of assurance" of the authentication process is present as an attribute.
+
+The `sigval-service.ui.hide-loa-uri` property holds an optional comma-separated list of AuthenticationContextClassRef URI:s that should not be displayed
+as the level of assurance achieved on the result page.
+This option may be used if a generic non informative URI is present in the certificate
+(e.g. `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`).
+
+**NOTE:** For LoA URI to be shown at all in the result UI, the property `sigval-service.ui.show-loa` must be set to true.
 
 
 ## version 1.2.8
