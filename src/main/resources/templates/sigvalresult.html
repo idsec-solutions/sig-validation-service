@@ -165,7 +165,7 @@
                                 <td class="sig-res-param" th:text="${text.getString('sp')}"></td>
                                 <td th:text="${sigData.getServiceProvider()}"></td>
                             </tr>
-                            <tr th:if="${showLoa}">
+                            <tr th:if="${showLoa && sigData.getLoa() != null}">
                                 <td class="sig-res-param" th:text="${text.getString('loa')}"></td>
                                 <td th:text="${sigData.getLoa()}"></td>
                             </tr>

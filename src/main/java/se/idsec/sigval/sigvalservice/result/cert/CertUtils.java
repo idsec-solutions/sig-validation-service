@@ -18,13 +18,18 @@ package se.idsec.sigval.sigvalservice.result.cert;
 
 import lombok.extern.java.Log;
 import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.X509CertificateHolder;
+import se.swedenconnect.cert.extensions.data.saci.AttributeMapping;
 
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Log
 public class CertUtils {
@@ -96,16 +101,94 @@ public class CertUtils {
     return subjectDnAttributeMap;
   }
 
-  private static String getStringValue(final ASN1Encodable rdnVal) {
-    if (rdnVal instanceof DERUTF8String) {
-      final DERUTF8String utf8Str = (DERUTF8String) rdnVal;
+  private static String getStringValue(final ASN1Encodable attrVal) {
+    if (attrVal instanceof DERUTF8String) {
+      DERUTF8String utf8Str = (DERUTF8String) attrVal;
       return utf8Str.getString();
     }
-    if (rdnVal instanceof DERPrintableString) {
-      final DERPrintableString str = (DERPrintableString) rdnVal;
+    if (attrVal instanceof DERPrintableString) {
+      DERPrintableString str = (DERPrintableString) attrVal;
       return str.getString();
     }
-    return rdnVal.toString();
+    if (attrVal instanceof DERIA5String) {
+      DERIA5String str = (DERIA5String) attrVal;
+      return str.getString();
+    }
+    if (attrVal instanceof ASN1GeneralizedTime) {
+      ASN1GeneralizedTime dgTime = (ASN1GeneralizedTime) attrVal;
+      try {
+        return Instant.ofEpochMilli(dgTime.getDate().getTime()).atZone(ZoneId.of("UTC")).format(DateTimeFormatter.ISO_LOCAL_DATE);
+      }
+      catch (Exception e) {
+        dgTime.toString();
+      }
+    }
+    return attrVal.toString();
+  }
+
+  public static String getReferencedAttributeValue(X509Certificate certificate, AttributeMapping.Type type, String ref) throws IOException {
+    switch (type) {
+    case rdn:
+      return getRdn(certificate, ref);
+    case san:
+      return getSan(certificate, ref);
+    case sda:
+      return getSda(certificate, ref);
+    }
+    throw new IOException("Illegal attribute mapping type");
+  }
+
+  private static String getSda(X509Certificate certificate, String ref) throws IOException {
+    try {
+      X509CertificateHolder certificateHolder = new X509CertificateHolder(certificate.getEncoded());
+      Extension extension = certificateHolder.getExtension(Extension.subjectDirectoryAttributes);
+      if(extension == null) {
+        return null;
+      }
+      SubjectDirectoryAttributes sdaExt = SubjectDirectoryAttributes.getInstance(extension.getParsedValue());
+      Vector<Attribute> attributes = sdaExt.getAttributes();
+      for (Attribute attribute : attributes) {
+        ASN1ObjectIdentifier attrOid = attribute.getAttrType();
+        if (attrOid.getId().equals(ref)) {
+          ASN1Set attrValues = attribute.getAttrValues();
+          if (attrValues.size() > 0) {
+            ASN1Encodable attrValue = attrValues.getObjectAt(0);
+            return getStringValue(attrValue);
+          }
+        }
+      }
+    }
+    catch (CertificateEncodingException e) {
+      throw new IOException(e);
+    }
+    return null;
+  }
+
+  private static String getSan(X509Certificate certificate, String ref) throws IOException {
+    try {
+      X509CertificateHolder certificateHolder = new X509CertificateHolder(certificate.getEncoded());
+      Extension extension = certificateHolder.getExtension(Extension.subjectAlternativeName);
+      GeneralNames generalNames = GeneralNames.getInstance(extension.getParsedValue());
+      List<String> subjectAltNames = new ArrayList<>();
+      for (GeneralName generalName : generalNames.getNames()) {
+        if (String.valueOf(generalName.getTagNo()).equals(ref) ) {
+          subjectAltNames.add(DERIA5String.getInstance(generalName.getName()).getString());
+        }
+      }
+      return subjectAltNames.isEmpty() ? null : String.join(",", subjectAltNames);
+    }
+    catch (Exception e) {
+      throw new IOException(e);
+    }
+  }
+
+  private static String getRdn(X509Certificate certificate, String ref) throws IOException {
+    Map<SubjectDnAttribute, String> subjectAttributes = getSubjectAttributes(certificate);
+    return subjectAttributes.keySet().stream()
+      .filter(subjectDnAttribute -> subjectDnAttribute.getOid().equalsIgnoreCase(ref))
+      .map(subjectAttributes::get)
+      .findFirst()
+      .orElse(null);
   }
 
 }
