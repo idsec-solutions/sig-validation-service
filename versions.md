@@ -1,6 +1,6 @@
 # Signature Validation Service versions
 
-**Latest Current version: 1.2.9**
+**Latest Current version: 1.2.10**
 
 | Version | Comment                                                                                                   | Date       |
 |---------|-----------------------------------------------------------------------------------------------------------|------------|
@@ -19,6 +19,7 @@
 | 1.2.7   | UI updates                                                                                                | 2023-12-11 |
 | 1.2.8   | Corrected display of validation result with SVT                                                           | 2024-02-09 |
 | 1.2.9   | Corrected display of authentication LoA level                                                             | 2024-04-16 |
+| 1.2.10  | Minor javascript fix                                                                                      | 2024-06-14 |
 
 
 ## version 1.2.8
