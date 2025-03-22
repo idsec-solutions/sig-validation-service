@@ -16,6 +16,7 @@
 
 package se.idsec.sigval.sigvalservice.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,6 @@ import se.idsec.sigval.sigvalservice.configuration.ui.LogoImages;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIStyle;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIText;
 
-import javax.servlet.http.HttpSession;
 
 @Controller
 public class MainController {

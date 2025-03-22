@@ -16,6 +16,7 @@
 
 package se.idsec.sigval.sigvalservice.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,6 @@ import se.swedenconnect.sigval.report.data.SigvalReportOptions;
 import se.swedenconnect.sigval.xml.data.ExtendedXmlSigvalResult;
 import se.swedenconnect.sigval.xml.verify.ExtendedXMLSignedDocumentValidator;
 
-import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,5 @@
-FROM openjdk:11-jre
+FROM openjdk:21-jdk-buster
+
 
 ADD target/sigval-service-*.jar /app.jar
 ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000","-jar","/app.jar"]
