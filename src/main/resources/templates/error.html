@@ -8,35 +8,40 @@
 
     <script src="webjars/jquery/3.7.1/jquery.min.js"></script>
     <script src="webjars/popper.js/1.16.1/dist/umd/popper.min.js"></script>
-    <script src="webjars/bootstrap/4.6.2/js/bootstrap.min.js"></script>
+    <script src="webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+<!--
     <script src="webjars/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
     <script src="webjars/bootstrap-select/1.13.18/js/i18n/defaults-sv_SE.min.js"></script>
+-->
 
-    <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>
+    <!--    <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>-->
+    <link rel="stylesheet" href="webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="webjars/font-awesome/6.4.0/css/all.min.css"/>
+<!--
     <link rel="stylesheet" href="webjars/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
-    <link rel="stylesheet" href="webjars/highlightjs/11.5.0/styles/atom-one-light.min.css"/>
+-->
 
     <title th:text="${basicModel.getHtmlTitleError()}"></title>
 </head>
 <body>
 <div class="container">
-    <div class="card" style="margin-top: 10px">
-        <div class="card-header" style="text-align: center">
-            <h2>
-                <img style="float: left" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
-                <span th:if="${basicModel.isDevmode()}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
-                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" style="float: right" th:src="${basicModel.getSecondaryLogoUrl()}" alt='Logo' height='50'>
+    <div class="card mt-3">
+        <div class="card-header text-center">
+            <h2 class="d-flex justify-content-between align-items-center">
+                <img class="me-2" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
+                <span th:if="${basicModel.isDevmode()}">
+                    (<span class="text-warning">Utveckling</span>)
+                </span>
+                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" class="ms-2" th:src="${basicModel.getSecondaryLogoUrl()}" alt="Logo" height="50">
             </h2>
         </div>
         <div class="card-body">
             <h5>Ett fel har inträffat.</h5>
             <!--/*@thymesVar id="message" type="java.lang.String"*/-->
-            <div th:if="${message != null}" th:text="${message}" style="margin-bottom: 20px; color: darkred"></div>
+            <div th:if="${message != null}" class="mb-3 text-danger" th:text="${message}"></div>
             <a href="home" class="btn btn-primary">Tillbaka</a>
         </div>
     </div>
 </div>
-
 </body>
 </html>

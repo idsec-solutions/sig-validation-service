@@ -8,17 +8,15 @@
 
     <script src="webjars/jquery/3.7.1/jquery.min.js"></script>
     <script src="webjars/popper.js/1.16.1/dist/umd/popper.min.js"></script>
-    <script src="webjars/bootstrap/4.6.2/js/bootstrap.min.js"></script>
-    <script src="webjars/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-    <script src="webjars/bootstrap-select/1.13.18/js/i18n/defaults-sv_SE.min.js"></script>
+    <script src="webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
     <script src="webjars/bootstrap-fileinput/5.5.2/js/fileinput.min.js"></script>
     <script src="webjars/bootstrap-fileinput/5.5.2/js/locales/sv.js"></script>
     <script src="webjars/js-cookie/3.0.5/dist/js.cookie.min.js"></script>
     <script src="js/upload.js"></script>
     <script src="js/lang.js"></script>
 
-    <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>
-    <link rel="stylesheet" href="webjars/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
+    <!--    <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>-->
+    <link rel="stylesheet" href="webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="webjars/bootstrap-fileinput/5.5.2/css/fileinput.min.css"/>
     <link rel="stylesheet" href="css/main.css"/>
 
@@ -35,31 +33,35 @@
 </head>
 <body>
 <div class="container">
-    <div class="card" style="margin-top: 10px">
-        <div class="card-header" style="text-align: center">
-            <h2>
-                <img style="float: left" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
-                <span th:if="${basicModel.isDevmode()}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
-                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" style="float: right" th:src="${basicModel.getSecondaryLogoUrl()}" alt='Logo' height='50' >
+    <div class="card mt-3">
+        <div class="card-header text-center">
+            <h2 class="d-flex justify-content-between align-items-center">
+                <img class="me-2" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
+                <span th:if="${basicModel.isDevmode()}">
+                    (<span class="text-warning">Utveckling</span>)
+                </span>
+                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" class="ms-2" th:src="${basicModel.getSecondaryLogoUrl()}" alt="Logo" height="50">
             </h2>
         </div>
         <div class="card-body">
-            <div style="float: right">
-                <a th:href="'javascript:selectLang(\'en\',\'' + ${lang} + '\',\'home\')'" th:class="${lang.equalsIgnoreCase('en') ? 'lang-selected':''}">en</a>
-                <a th:href="'javascript:selectLang(\'sv\',\'' + ${lang} + '\',\'home\')'" th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected':''}">sv</a>
+            <div class="float-end">
+                <a th:href="'javascript:selectLang(\'en\',\'' + ${lang} + '\',\'home\')'"
+                   th:class="${lang.equalsIgnoreCase('en') ? 'lang-selected':''}" class="me-2">en</a>
+                <a th:href="'javascript:selectLang(\'sv\',\'' + ${lang} + '\',\'home\')'"
+                   th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected':''}">sv</a>
             </div>
             <h4 th:text="${text.getString('title1')}"></h4>
             <!-- Upload widget -->
-            <div id="uploadDocDiv" class="form-group" style="width: 100%;margin-top: 10px;">
-                <label for="uploadedFileInput"><bolder th:text="${text.getString('title2')}"></bolder></label>
-                <input id="uploadedFileInput" name="uploadedFile" type="file" multiple="" class="form-control file-loading"/>
-                <div id="kv-error-2" style="margin-top:10px;display:none"></div>
-                <div id="kv-success-2" class="alert alert-success fade in" style="margin-top:10px;display:none"></div>
+            <div id="uploadDocDiv" class="form-group w-100 mt-3">
+                <label for="uploadedFileInput">
+                    <b th:text="${text.getString('title2')}"></b>
+                </label>
+                <input id="uploadedFileInput" name="uploadedFile" type="file" multiple=""
+                       class="form-control file-loading" />
+                <div id="kv-error-2" class="mt-3 d-none"></div>
+                <div id="kv-success-2" class="alert alert-success fade show mt-3 d-none"></div>
             </div>
-
         </div>
     </div>
 </div>
-
-</body>
-</html>
+</body></html>

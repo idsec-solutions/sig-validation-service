@@ -97,6 +97,7 @@
                 <artifactId>error_prone_annotations</artifactId>
                 <version>2.36.0</version>
             </dependency>
+<!--
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>bootstrap</artifactId>
@@ -107,6 +108,7 @@
                 <artifactId>jquery</artifactId>
                 <version>3.7.1</version>
             </dependency>
+-->
         </dependencies>
     </dependencyManagement>
 
@@ -213,20 +215,17 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
+            <version>5.3.3</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
+            <version>3.7.1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>popper.js</artifactId>
             <version>1.16.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>bootstrap-select</artifactId>
-            <version>1.13.18</version>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>
