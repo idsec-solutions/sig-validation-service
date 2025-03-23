@@ -91,7 +91,7 @@
                 <version>10.0.2</version>
             </dependency>
 
-            <!-- Convergence errors -->
+            <!-- Convergence error corrections -->
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
@@ -107,33 +107,9 @@
                 <artifactId>jquery</artifactId>
                 <version>3.7.1</version>
             </dependency>
-            <!--
-            <dependency>
-               <groupId>org.apache.santuario</groupId>
-               <artifactId>xmlsec</artifactId>
-               <version>4.0.3</version>
-            </dependency>
-            <dependency>
-                <groupId>se.idsec.signservice.commons</groupId>
-                <artifactId>signservice-xml-commons</artifactId>
-                <version>1.2.4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>6.2.5</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
-                <version>6.2.5</version>
-            </dependency>
-            -->
-
         </dependencies>
-
-
     </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
