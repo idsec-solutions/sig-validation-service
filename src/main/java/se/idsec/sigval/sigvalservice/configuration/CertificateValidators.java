@@ -17,6 +17,7 @@
 package se.idsec.sigval.sigvalservice.configuration;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.openssl.PEMParser;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Component
 @DependsOn("webClientBean")
 public class CertificateValidators {
@@ -79,9 +81,13 @@ public class CertificateValidators {
     CertStore certStore = null;
 
     if (tslTrustRoot != null) {
-      TslTrustCertStoreFactory ttCSFactory = new TslTrustCertStoreFactory(tslTrustRoot, webClient);
-      policyRoot = ttCSFactory.getPolicyRoot();
-      certStore = ttCSFactory.getCertStore();
+      try {
+        TslTrustCertStoreFactory ttCSFactory = new TslTrustCertStoreFactory(tslTrustRoot, webClient);
+        policyRoot = ttCSFactory.getPolicyRoot();
+        certStore = ttCSFactory.getCertStore();
+      } catch (Exception e) {
+        log.error("Failed to load trusted certificates from TSL source: {}", tslTrustRoot, e);
+      }
     }
     X509Certificate[] additionalCertsArray = getAdditionalTrustedCerts(policyRoot, trustFolder);
     return new StatusCheckingCertificateValidatorImpl(crlCache, certStore, additionalCertsArray);

@@ -64,13 +64,13 @@ public class TslTrustCertStoreFactory {
     init();
   }
 
-  public TslTrustCertStoreFactory(X509Certificate policyRoot, WebClient webClient) {
+  public TslTrustCertStoreFactory(X509Certificate policyRoot, WebClient webClient) throws IOException {
     this.policyRoot = policyRoot;
     this.webClient = webClient;
     init();
   }
 
-  private void init() {
+  private void init() throws IOException {
     List<X509Certificate> certificateList = new ArrayList<>();
     try {
       SubjectInformationAccess siaExtension = CertUtils.getSIAExtension(policyRoot);
@@ -139,7 +139,7 @@ public class TslTrustCertStoreFactory {
     }
     catch (Exception ex) {
       log.warn("Unable to extract cert store from provided policy root certificate", ex);
-      throw new RuntimeException("Unable to extract cert store from provided policy root certificate", ex);
+      throw new IOException("Unable to extract cert store from provided policy root certificate", ex);
     }
   }
 
