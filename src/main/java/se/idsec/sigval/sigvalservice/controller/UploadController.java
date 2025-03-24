@@ -18,22 +18,27 @@ package se.idsec.sigval.sigvalservice.controller;
 
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSObjectJSON;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.log4j.Log4j2;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import se.idsec.sigval.sigvalservice.configuration.FileSize;
 import se.swedenconnect.sigval.commons.data.ExtendedSigValResult;
 import se.swedenconnect.sigval.commons.data.SignedDocumentValidationResult;
 import se.swedenconnect.sigval.commons.document.DocType;
-import se.idsec.sigval.sigvalservice.configuration.FileSize;
 import se.swedenconnect.sigval.xml.utils.XMLDocumentBuilder;
 
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.List;
 
 @Log4j2
 @RestController
@@ -160,7 +165,7 @@ public class UploadController {
 
   private void checkPdfFileValidity(byte[] bytes) throws IOException {
     try {
-      PDDocument document = PDDocument.load(bytes);
+      PDDocument document = Loader.loadPDF(bytes);
       // We are not modifying the document, so we close it directly to avoid memory leak
       document.close();
     }

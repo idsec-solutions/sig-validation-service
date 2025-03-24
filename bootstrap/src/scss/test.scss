@@ -1,0 +1,37 @@
+// Import Bootstrap core functions, variables, and mixins
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+$theme-colors: (
+        "primary":    #3B5B71,
+        "secondary":  $secondary,
+        "success":    $success,
+        "info":       $cyan-700,
+        "warning":    $orange-500,
+        "danger":     $red-600,
+        "light":      $light,
+        "dark":       $dark
+);
+
+$table-variants: (
+        "primary":    shift-color($cyan-900, $table-bg-scale),
+        "secondary":  $secondary,
+        "success":    shift-color($success, $table-bg-scale),
+        "info":       shift-color($cyan-900, $table-bg-scale),
+        "warning":    shift-color($orange-800, $table-bg-scale),
+        "danger":     $red-700,
+        "light":      $light,
+        "dark":       $dark,
+);
+
+$container-max-widths: (
+        sm: 540px,
+        md: 720px,
+        lg: 960px,
+        xl: 1140px,
+        xxl: 1620px
+);
+
+// Finally, import Bootstrap styles
+@import "bootstrap/scss/bootstrap";

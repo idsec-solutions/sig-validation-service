@@ -1,0 +1,88 @@
+// Import Bootstrap core functions, variables, and mixins
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+//$primary-color: #ff4500;
+$primary-color: #cc3700;
+$secondary-color: #6c757d;
+$success-color: #28a745;
+$info-color: #17a2b8;
+$warning-color: #ffc107;
+$danger-color: #dc3545;
+$light-color: #f8f9fa;
+$dark-color: #343a40;
+
+$theme-colors: (
+        "primary": $primary-color,
+        "secondary": $secondary-color,
+        "success": $success-color,
+        "info": $info-color,
+        "warning": $warning-color,
+        "danger": $danger-color,
+        "light": $light-color,
+        "dark": $dark-color
+);
+
+$link-color: $primary-color;
+$link-hover-color: darken($primary-color, 20%);
+$card-color: #555;
+$table-color: #555;
+$table-striped-color: #555;
+$btn-hover-bg-shade-percentage: 15%;
+
+// Button gradients
+$enable-gradients: true;
+$btn-primary-gradient: linear-gradient(
+                to bottom,
+                lighten($primary-color, 15%),
+                $primary-color); // Highlight at top
+
+$btn-secondary-gradient: linear-gradient(
+                to bottom,
+                lighten($secondary-color, 15%),
+                $secondary-color
+);
+
+$btn-success-gradient: linear-gradient(
+                to bottom,
+                lighten($success-color, 15%),
+                $success-color
+);
+
+$btn-info-gradient: linear-gradient(
+                to bottom,
+                lighten($info-color, 15%),
+                $info-color
+);
+$btn-warning-gradient: linear-gradient(
+                to bottom,
+                lighten($warning-color, 15%),
+                $warning-color
+);
+$btn-danger-gradient: linear-gradient(
+                to bottom,
+                lighten($danger-color, 15%),
+                $danger-color
+);
+$btn-light-gradient: linear-gradient(
+                to bottom,
+                lighten($light-color, 15%),
+                $light-color
+);
+$btn-dark-gradient: linear-gradient(
+                to bottom,
+                lighten($dark-color, 15%),
+                $dark-color
+);
+
+$container-max-widths: (
+        sm: 508px,
+        md: 688px,
+        lg: 928px,
+        xl: 1140px,
+        xxl: 1108px
+);
+
+// Finally, import Bootstrap styles
+@import "bootstrap/scss/bootstrap";

@@ -16,19 +16,16 @@
 
 package se.idsec.sigval.sigvalservice.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import se.idsec.sigval.sigvalservice.configuration.FileSize;
 import se.idsec.sigval.sigvalservice.configuration.ui.BasicUiModel;
-import se.idsec.sigval.sigvalservice.configuration.ui.LogoImages;
-import se.idsec.sigval.sigvalservice.configuration.ui.UIStyle;
 import se.idsec.sigval.sigvalservice.configuration.ui.UIText;
 
-import javax.servlet.http.HttpSession;
 
 @Controller
 public class MainController {

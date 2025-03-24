@@ -17,6 +17,7 @@
 package se.idsec.sigval.sigvalservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,6 @@ import se.swedenconnect.sigval.commons.data.SignedDocumentValidationResult;
 import se.swedenconnect.sigval.commons.document.DocType;
 import se.swedenconnect.sigval.xml.utils.XMLDocumentBuilder;
 
-import javax.servlet.http.HttpSession;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

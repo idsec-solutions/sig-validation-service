@@ -17,15 +17,15 @@
 package se.idsec.sigval.sigvalservice.configuration;
 
 import lombok.Getter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.HttpClient;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.openssl.PEMParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import se.idsec.signservice.security.certificate.CertificateValidator;
 import se.swedenconnect.sigval.cert.chain.impl.StatusCheckingCertificateValidatorImpl;
@@ -41,12 +41,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Component
-@DependsOn("httpClientBean")
+@DependsOn("webClientBean")
 public class CertificateValidators {
 
   private final CRLCache crlCache;
-  private final HttpClient httpClient;
+  private final WebClient webClient;
   @Value("${sigval-service.cert-validator.sig.tsltrust-root:#{null}}") String sigTslTrustRoot;
   @Value("${sigval-service.cert-validator.sig.trusted-folder:#{null}}") String sigTrustFolder;
   @Value("${sigval-service.cert-validator.tsa.tsltrust-root:#{null}}") String tsaTslTrustRoot;
@@ -61,9 +62,9 @@ public class CertificateValidators {
   @Getter private List<X509Certificate> kidMatchCerts;
 
   @Autowired
-  public CertificateValidators(CRLCache crlCache, HttpClient httpClient) {
+  public CertificateValidators(CRLCache crlCache, WebClient webClient) {
     this.crlCache = crlCache;
-    this.httpClient = httpClient;
+    this.webClient = webClient;
   }
 
   public void loadValidators() throws IOException, CertificateException {
@@ -80,9 +81,13 @@ public class CertificateValidators {
     CertStore certStore = null;
 
     if (tslTrustRoot != null) {
-      TslTrustCertStoreFactory ttCSFactory = new TslTrustCertStoreFactory(tslTrustRoot, httpClient);
-      policyRoot = ttCSFactory.getPolicyRoot();
-      certStore = ttCSFactory.getCertStore();
+      try {
+        TslTrustCertStoreFactory ttCSFactory = new TslTrustCertStoreFactory(tslTrustRoot, webClient);
+        policyRoot = ttCSFactory.getPolicyRoot();
+        certStore = ttCSFactory.getCertStore();
+      } catch (Exception e) {
+        log.error("Failed to load trusted certificates from TSL source: {}", tslTrustRoot, e);
+      }
     }
     X509Certificate[] additionalCertsArray = getAdditionalTrustedCerts(policyRoot, trustFolder);
     return new StatusCheckingCertificateValidatorImpl(crlCache, certStore, additionalCertsArray);

@@ -50,15 +50,23 @@ public class TimedTasks implements InitializingBean {
   @Scheduled(initialDelayString = "${sigval-service.crl.recache-delay-seconds:3600}" + "000", fixedDelayString =
     "${sigval-service.crl.recache-delay-seconds:3600}" + "000")
   public synchronized void recacheCRLs() {
-    log.info("Initiated CRL re-cache");
-    crlCache.recache();
-    log.debug("Finished CRL re-cache");
+    try {
+      log.info("Initiated CRL re-cache");
+      crlCache.recache();
+      log.debug("Finished CRL re-cache");
+    } catch (Exception e) {
+      log.warn("Failed to re-cache CRLs", e);
+    }
   }
 
   @Scheduled(initialDelayString = "${sigval-service.validators.reload-interval-seconds:600}" + "000", fixedDelayString =
     "${sigval-service.validators.reload-interval-seconds}" + "000")
   public synchronized void reloadValidators() throws IOException, NoSuchAlgorithmException, CertificateException, JOSEException {
-    signatureValidatorProvider.loadValidators();
+    try {
+      signatureValidatorProvider.loadValidators();
+    } catch (Exception e) {
+      log.warn("Failed to reload signature validators", e);
+    }
   }
 
 

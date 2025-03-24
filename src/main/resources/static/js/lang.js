@@ -17,7 +17,7 @@
 var langCookieName = "langSelect"
 
 function selectLang(lang, currentLang, destination){
-    $.cookie(langCookieName, lang, {expires : 100})
+    Cookies.set(langCookieName, lang, {expires : 100})
     if (lang === currentLang){
         return;
     }

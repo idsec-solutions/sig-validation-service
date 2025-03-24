@@ -69,7 +69,7 @@ public class ResultPageDataGenerator {
     this.uiText = uiText;
   }
 
-  public ResultPageData getResultPageData(SignedDocumentValidationResult sigValResult, String documentName, String documentType, String lang) {
+  public ResultPageData getResultPageData(SignedDocumentValidationResult<? extends ExtendedSigValResult> sigValResult, String documentName, String documentType, String lang) {
 
     ResultPageData.ResultPageDataBuilder rpdBuilder = ResultPageData.builder();
     rpdBuilder
@@ -85,9 +85,9 @@ public class ResultPageDataGenerator {
     return generateResultPgeData(sigValResult, rpdBuilder.build(), lang);
   }
 
-  private ResultPageData generateResultPgeData(SignedDocumentValidationResult sigValResult, ResultPageData resultPageData, String lang) {
+  private ResultPageData generateResultPgeData(SignedDocumentValidationResult<? extends ExtendedSigValResult> sigValResult, ResultPageData resultPageData, String lang) {
 
-    List<ExtendedSigValResult> signatureValidationResults = sigValResult.getSignatureValidationResults();
+    List<? extends ExtendedSigValResult> signatureValidationResults = sigValResult.getSignatureValidationResults();
 
     List<ResultSignatureData> signatureData = signatureValidationResults.stream()
       .map(signatureValResult -> getSignatureResult(signatureValResult, lang))
@@ -96,11 +96,10 @@ public class ResultPageDataGenerator {
 
     boolean oneValidSigCoversAlldata = signatureData.stream()
       .filter(resultSignatureData -> resultSignatureData.getStatus().equals(SigValidStatus.ok))
-      .filter(resultSignatureData -> resultSignatureData.isCoversAllData())
-      .findFirst().isPresent();
+      .anyMatch(ResultSignatureData::isCoversAllData);
     List<ResultSignatureData> validSignatures = signatureData.stream()
       .filter(resultSignatureData -> resultSignatureData.getStatus().equals(SigValidStatus.ok))
-      .collect(Collectors.toList());
+      .toList();
     int validSigCount = validSignatures.size();
     resultPageData.setValidSignatures(validSigCount);
     if (validSigCount > 0 && oneValidSigCoversAlldata) {
@@ -142,12 +141,12 @@ public class ResultPageDataGenerator {
       builder.validationDateLimit(getValidationDateLimit(signatureValResult));
       break;
     case INTERDETERMINE:
+    case ERROR_NOT_TRUSTED:
       builder.status(SigValidStatus.incomplete);
       break;
     case ERROR_INVALID_SIGNATURE:
     case ERROR_SIGNER_INVALID:
     case ERROR_SIGNER_NOT_ACCEPTED:
-    case ERROR_NOT_TRUSTED:
     case ERROR_BAD_FORMAT:
       builder.status(SigValidStatus.sigerror);
     }

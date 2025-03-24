@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap Bundle JS (includes Popper) from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Reference SCSS files directly so Parcel compiles them on the fly -->
+  <link rel="stylesheet" href="./scss/test.scss" data-theme="test">
+  <link rel="stylesheet" href="./scss/bootstrap-swedenconnect.scss" data-theme="swedenconnect" disabled>
+  <link rel="stylesheet" href="./scss/bootstrap-edusign.scss" data-theme="edusign" disabled></head>
+  <link rel="stylesheet" href="./scss/bootstrap-sunet.scss" data-theme="sunet" disabled></head>
+
+<title>Bootstrap Theme Test Page 1</title>
+
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Test Page</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarContent" aria-controls="navbarContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Features</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Pricing</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+             role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            More
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li>
+          </ul>
+        </li>
+      </ul>
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search"
+               aria-label="Search" />
+        <button class="btn btn-outline-light" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-5">
+
+  <label for="cssSelector" class="form-label"><b>Select Theme:</b></label>
+  <div class="row">
+    <div class="col-10">
+      <!-- Select dev theme -->
+      <div class="mb-4">
+        <select id="cssSelector" class="form-select" onchange="switchTheme()">
+          <option value="test">Test</option>
+          <option value="swedenconnect">Sweden Connect</option>
+          <option value="edusign">eduSign</option>
+          <option value="sunet">Sunet</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-2">
+      <table>
+        <tr><td><a class="btn btn-primary" href="test-2.html">Test page 2</a></td></tr>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- 1. Theme Colors -->
+  <section id="theme-colors">
+    <h2>Theme Colors</h2>
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <div class="p-3 text-white bg-primary text-center">Primary</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 text-white bg-secondary text-center">Secondary</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 text-white bg-success text-center">Success</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 text-white bg-danger text-center">Danger</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 text-dark bg-warning text-center">Warning</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 text-white bg-info text-center">Info</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 text-dark bg-light text-center border">Light</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 text-white bg-dark text-center">Dark</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Cards with Theme Colors -->
+  <section id="cards" class="my-5">
+    <h2>Theme Cards</h2>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      <div class="col">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title">Primary Card</h5>
+          </div>
+          <div class="card-body">
+            <p class="card-text">Uses the primary theme color.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="card-title">Secondary Card</h5>
+          </div>
+          <div class="card-body">
+            <p class="card-text">Uses the secondary theme color.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title">Success Card</h5>
+          </div>
+          <div class="card-body">
+            <p class="card-text">Uses the success theme color.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <div class="card-header bg-danger text-white">
+            <h5 class="card-title">Danger Card</h5>
+          </div>
+          <div class="card-body">
+            <p class="card-text">Uses the danger theme color.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Tables -->
+  <section id="tables" class="my-5">
+    <h2>Tables</h2>
+    <div class="row">
+      <div class="col-4">
+        <!-- Standard Table -->
+        <div class="mb-4">
+          <h4>Standard Table</h4>
+          <table class="table">
+            <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">First</th>
+              <th scope="col">Last</th>
+              <th scope="col">Handle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Larry</td>
+              <td>Bird</td>
+              <td>@twitter</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-4">
+        <!-- Striped Table -->
+        <div class="mb-4">
+          <h4>Striped Table</h4>
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">First</th>
+              <th scope="col">Last</th>
+              <th scope="col">Handle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Larry</td>
+              <td>Bird</td>
+              <td>@twitter</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-4">
+        <!-- Small Table -->
+        <div>
+          <h4>Small Table</h4>
+          <table class="table table-sm">
+            <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">First</th>
+              <th scope="col">Last</th>
+              <th scope="col">Handle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Larry</td>
+              <td>Bird</td>
+              <td>@twitter</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Select and Buttons -->
+  <section id="form-controls" class="my-5">
+    <h2>Form Controls & Buttons</h2>
+    <!-- Select -->
+    <div class="mb-4">
+      <label for="exampleSelect" class="form-label">Example Select</label>
+      <select class="form-select" id="exampleSelect">
+        <option selected>Choose an option</option>
+        <option value="1">Option One</option>
+        <option value="2">Option Two</option>
+        <option value="3">Option Three</option>
+      </select>
+    </div>
+    <!-- Buttons -->
+    <div class="mb-4">
+      <h4>Buttons</h4>
+      <button type="button" class="btn btn-primary me-2">Primary</button>
+      <button type="button" class="btn btn-secondary me-2">Secondary</button>
+      <button type="button" class="btn btn-success me-2">Success</button>
+      <button type="button" class="btn btn-danger me-2">Danger</button>
+      <button type="button" class="btn btn-warning me-2">Warning</button>
+      <button type="button" class="btn btn-info me-2">Info</button>
+      <button type="button" class="btn btn-light me-2">Light</button>
+      <button type="button" class="btn btn-dark me-2">Dark</button>
+    </div>
+  </section>
+
+  <!-- 5. Links and Menus -->
+  <section id="links-menus" class="my-5">
+    <h2>Links & Menus</h2>
+    <!-- Links -->
+    <div class="mb-4">
+      <h4>Links</h4>
+      <p>
+        <a href="#" class="link-primary me-2">Primary Link</a>
+        <a href="#" class="link-secondary me-2">Secondary Link</a>
+        <a href="#" class="link-success me-2">Success Link</a>
+        <a href="#" class="link-danger me-2">Danger Link</a>
+        <a href="#" class="link-warning me-2">Warning Link</a>
+        <a href="#" class="link-info me-2">Info Link</a>
+        <a href="#" class="link-dark me-2">Dark Link</a>
+        <a href="#" class="link-light">Light Link</a>
+      </p>
+    </div>
+    <!-- Menu (Navbar) -->
+    <div class="mb-4">
+      <h4>Menu</h4>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Menu</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Contact</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+</div>
+
+<!-- 6. Footer -->
+<footer class="bg-dark text-white text-center py-3">
+  <div class="container">
+    <p class="mb-0">© 2025 Your Company. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Script to switch the active SCSS theme and store selection in localStorage -->
+<script>
+    function switchTheme() {
+        var selectedTheme = document.getElementById("cssSelector").value;
+        // Get all link tags that have a data-theme attribute
+        var links = document.querySelectorAll('link[data-theme]');
+        links.forEach(link => {
+            // Enable the link whose data-theme matches the selection, disable others
+            link.disabled = (link.getAttribute('data-theme') !== selectedTheme);
+        });
+        // Store the selected theme in localStorage
+        localStorage.setItem('selectedTheme', selectedTheme);
+    }
+
+    // On page load, check localStorage for a saved theme and apply it
+    document.addEventListener('DOMContentLoaded', function() {
+        var savedTheme = localStorage.getItem('selectedTheme');
+        if (savedTheme) {
+            document.getElementById("cssSelector").value = savedTheme;
+            switchTheme();
+        }
+    });
+</script>
+</body>
+</html>

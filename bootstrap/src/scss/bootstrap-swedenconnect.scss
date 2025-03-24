@@ -1,0 +1,87 @@
+// Import Bootstrap core functions, variables, and mixins
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+$primary-color: #446E9B;
+$secondary-color: #999;
+$success-color: #3CB521;
+$info-color: #3399F3;
+$warning-color: #D47500;
+$danger-color: #CD0200;
+$light-color: #eee;
+$dark-color: #333;
+
+$theme-colors: (
+        "primary": $primary-color,
+        "secondary": $secondary-color,
+        "success": $success-color,
+        "info": $info-color,
+        "warning": $warning-color,
+        "danger": $danger-color,
+        "light": $light-color,
+        "dark": $dark-color
+);
+
+$link-color: #2d4866;
+$link-hover-color: lighten(#2d4866, 20%);
+$card-color: #666;
+$table-color: #666;
+$table-striped-color: #666;
+$btn-hover-bg-shade-percentage: 15%;
+
+// Button gradients
+$enable-gradients: true;
+$btn-primary-gradient: linear-gradient(
+                to bottom,
+                lighten(#446E9B, 15%),
+                #446E9B); // Highlight at top
+
+$btn-secondary-gradient: linear-gradient(
+                to bottom,
+                lighten($secondary-color, 15%),
+                $secondary-color
+);
+
+$btn-success-gradient: linear-gradient(
+                to bottom,
+                lighten($success-color, 15%),
+                $success-color
+);
+
+$btn-info-gradient: linear-gradient(
+                to bottom,
+                lighten($info-color, 15%),
+                $info-color
+);
+$btn-warning-gradient: linear-gradient(
+                to bottom,
+                lighten($warning-color, 15%),
+                $warning-color
+);
+$btn-danger-gradient: linear-gradient(
+                to bottom,
+                lighten($danger-color, 15%),
+                $danger-color
+);
+$btn-light-gradient: linear-gradient(
+                to bottom,
+                lighten($light-color, 15%),
+                $light-color
+);
+$btn-dark-gradient: linear-gradient(
+                to bottom,
+                lighten($dark-color, 15%),
+                $dark-color
+);
+
+$container-max-widths: (
+        sm: 508px,
+        md: 688px,
+        lg: 928px,
+        xl: 1140px,
+        xxl: 1108px
+);
+
+// Finally, import Bootstrap styles
+@import "bootstrap/scss/bootstrap";

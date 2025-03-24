@@ -16,17 +16,12 @@
 
 package se.idsec.sigval.sigvalservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -39,24 +34,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.w3c.dom.Document;
-
 import se.idsec.sigval.sigvalservice.configuration.SignatureValidatorProvider;
 import se.swedenconnect.sigval.commons.document.DocType;
 import se.swedenconnect.sigval.commons.svt.SVTExtendpolicy;
 import se.swedenconnect.sigval.commons.svt.SVTUtils;
 import se.swedenconnect.sigval.pdf.timestamp.issue.impl.PDFDocTimstampProcessor;
-import se.swedenconnect.sigval.svt.claims.SVTClaims;
-import se.swedenconnect.sigval.svt.claims.ValidationConclusion;
 import se.swedenconnect.sigval.svt.issuer.SVTModel;
 import se.swedenconnect.sigval.xml.utils.XMLDocumentBuilder;
-
-import javax.servlet.http.HttpSession;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 
 @RestController
 @Slf4j
