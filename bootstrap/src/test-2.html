@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap Bundle JS (includes Popper) from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Reference SCSS files directly so Parcel compiles them on the fly -->
+  <link rel="stylesheet" href="./scss/test.scss" data-theme="test">
+  <link rel="stylesheet" href="./scss/bootstrap-swedenconnect.scss" data-theme="swedenconnect" disabled>
+  <link rel="stylesheet" href="./scss/bootstrap-edusign.scss" data-theme="edusign" disabled></head>
+  <link rel="stylesheet" href="./scss/bootstrap-sunet.scss" data-theme="sunet" disabled></head>
+
+  <title>Bootstrap Test Page 2</title>
+
+</head>
+<body>
+
+
+<!-- Main Container -->
+<div class="container my-5">
+
+  <label for="cssSelector" class="form-label"><b>Select Theme:</b></label>
+  <div class="row">
+    <div class="col-10">
+      <!-- Select dev theme -->
+      <div class="mb-4">
+        <select id="cssSelector" class="form-select" onchange="switchTheme()">
+          <option value="test">Test</option>
+          <option value="swedenconnect">Sweden Connect</option>
+          <option value="edusign">eduSign</option>
+          <option value="sunet">Sunet</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-2">
+      <table>
+        <tr><td><a class="btn btn-primary" href="test.html">Test page 1</a></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Alert -->
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>Heads up!</strong> This is a warning alert—check it out!
+    <button type="button" class="btn-close" data-bs-dismiss="alert"
+            aria-label="Close"></button>
+  </div>
+
+  <!-- Carousel -->
+  <div id="carouselExampleIndicators" class="carousel slide mb-5"
+       data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselExampleIndicators"
+              data-bs-slide-to="0" class="active"
+              aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators"
+              data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators"
+              data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100"
+             width="800" height="400" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice"
+             focusable="false">
+          <title>First slide</title>
+          <rect width="100%" height="100%" fill="#777"></rect>
+          <text x="50%" y="50%" fill="#fff" dy=".3em">First Slide</text>
+        </svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100"
+             width="800" height="400" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="Second slide" preserveAspectRatio="xMidYMid slice"
+             focusable="false">
+          <title>Second slide</title>
+          <rect width="100%" height="100%" fill="#666"></rect>
+          <text x="50%" y="50%" fill="#fff" dy=".3em">Second Slide</text>
+        </svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100"
+             width="800" height="400" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="Third slide" preserveAspectRatio="xMidYMid slice"
+             focusable="false">
+          <title>Third slide</title>
+          <rect width="100%" height="100%" fill="#555"></rect>
+          <text x="50%" y="50%" fill="#fff" dy=".3em">Third Slide</text>
+        </svg>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button"
+            data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button"
+            data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <!-- Card Grid Example -->
+  <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+    <div class="col">
+      <div class="card h-100">
+        <svg class="bd-placeholder-img card-img-top" width="100%" height="180"
+             xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Placeholder: Image" preserveAspectRatio="xMidYMid slice"
+             focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="#868e96"></rect>
+          <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Card image</text>
+        </svg>
+        <div class="card-body">
+          <h5 class="card-title">Card title 1</h5>
+          <p class="card-text">Some quick example text to build on the card title
+            and make up the bulk of the card's content.</p>
+        </div>
+        <div class="card-footer">
+          <small class="text-muted">Last updated 3 mins ago</small>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <svg class="bd-placeholder-img card-img-top" width="100%" height="180"
+             xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Placeholder: Image" preserveAspectRatio="xMidYMid slice"
+             focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="#868e96"></rect>
+          <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Card image</text>
+        </svg>
+        <div class="card-body">
+          <h5 class="card-title">Card title 2</h5>
+          <p class="card-text">This card has supporting text below as a natural
+            lead-in to additional content.</p>
+        </div>
+        <div class="card-footer">
+          <small class="text-muted">Last updated 10 mins ago</small>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <svg class="bd-placeholder-img card-img-top" width="100%" height="180"
+             xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Placeholder: Image" preserveAspectRatio="xMidYMid slice"
+             focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="#868e96"></rect>
+          <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Card image</text>
+        </svg>
+        <div class="card-body">
+          <h5 class="card-title">Card title 3</h5>
+          <p class="card-text">This is a longer card with supporting text below as
+            a natural lead-in to additional content.</p>
+        </div>
+        <div class="card-footer">
+          <small class="text-muted">Last updated 20 mins ago</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sample Form -->
+  <form>
+    <h2>Sample Form</h2>
+    <div class="mb-3">
+      <label for="inputEmail" class="form-label">Email address</label>
+      <input type="email" class="form-control" id="inputEmail"
+             aria-describedby="emailHelp" />
+      <div id="emailHelp" class="form-text">
+        We'll never share your email with anyone else.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="inputPassword" class="form-label">Password</label>
+      <input type="password" class="form-control" id="inputPassword" />
+    </div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="checkMeOut" />
+      <label class="form-check-label" for="checkMeOut">Check me out</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+  <!-- Progress Bar -->
+  <div class="my-5">
+    <h2>Progress</h2>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped progress-bar-animated"
+           role="progressbar" style="width: 75%;" aria-valuenow="75"
+           aria-valuemin="0" aria-valuemax="100">75%</div>
+    </div>
+  </div>
+
+  <!-- Modal Trigger -->
+  <button type="button" class="btn btn-secondary my-3" data-bs-toggle="modal"
+          data-bs-target="#exampleModal">
+    Launch demo modal
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1"
+       aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal Title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          This is a modal example.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tooltips & Popovers -->
+  <div class="my-5">
+    <h2>Tooltips & Popovers</h2>
+    <button type="button" class="btn btn-outline-secondary"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            title="Tooltip on top">
+      Tooltip Button
+    </button>
+    <button type="button" class="btn btn-outline-secondary"
+            data-bs-toggle="popover" title="Popover title"
+            data-bs-content="And here's some amazing content. It's very engaging.">
+      Popover Button
+    </button>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-light py-3">
+  <div class="container">
+    <span class="text-muted">© 2025 Bootstrap Test Page</span>
+  </div>
+</footer>
+
+<script>
+    // Initialize tooltips and popovers once the DOM is ready.
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        popoverTriggerList.forEach(function (popoverTriggerEl) {
+            new bootstrap.Popover(popoverTriggerEl);
+        });
+    });
+
+    // Script to switch the active SCSS theme and store selection in localStorage
+    function switchTheme() {
+        var selectedTheme = document.getElementById("cssSelector").value;
+        // Get all link tags that have a data-theme attribute
+        var links = document.querySelectorAll('link[data-theme]');
+        links.forEach(link => {
+            // Enable the link whose data-theme matches the selection, disable others
+            link.disabled = (link.getAttribute('data-theme') !== selectedTheme);
+        });
+        // Store the selected theme in localStorage
+        localStorage.setItem('selectedTheme', selectedTheme);
+    }
+
+    // On page load, check localStorage for a saved theme and apply it
+    document.addEventListener('DOMContentLoaded', function() {
+        var savedTheme = localStorage.getItem('selectedTheme');
+        if (savedTheme) {
+            document.getElementById("cssSelector").value = savedTheme;
+            switchTheme();
+        }
+    });
+
+</script>
+<!-- Script to switch the active SCSS theme and store selection in localStorage -->
+</body>
+</html>

@@ -7,10 +7,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <script src="webjars/jquery/3.7.1/jquery.min.js"></script>
-    <script src="webjars/bootstrap/4.6.2/js/bootstrap.min.js"></script>
+    <script src="webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
     <script src="webjars/popper.js/1.16.1/dist/umd/popper.min.js"></script>
-    <script src="webjars/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-    <script src="webjars/bootstrap-select/1.13.18/js/i18n/defaults-sv_SE.min.js"></script>
     <script src="webjars/highlightjs/11.5.0/highlight.min.js"></script>
     <script src="webjars/js-cookie/3.0.5/dist/js.cookie.min.js"></script>
     <script src="js/result.js"></script>
@@ -18,7 +16,6 @@
 
     <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>
     <link rel="stylesheet" href="webjars/font-awesome/6.4.0/css/all.min.css"/>
-    <link rel="stylesheet" href="webjars/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
     <link rel="stylesheet" href="webjars/highlightjs/11.5.0/styles/atom-one-light.min.css"/>
     <link rel="stylesheet" href="css/main.css"/>
     <link rel="stylesheet" href="css/result.css"/>
@@ -28,22 +25,25 @@
 <body>
 <div class="container">
     <div class="card" style="margin-top: 10px">
-        <div class="card-header" style="text-align: center">
+        <div class="card-header text-center">
             <h2>
                 <img style="float: left" th:src="${basicModel.getLogoUrl()}" alt="Logo" height="50">
-                <span th:if="${basicModel.isDevmode()}" style='margin-right: 115px'>(<span style='color: #FF500D'>Utveckling</span>)</span>
-                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" style="float: right" th:src="${basicModel.getSecondaryLogoUrl()}" alt='Logo' height='50'>
+                <span th:if="${basicModel.isDevmode()}" style="margin-right: 115px">
+                    (<span style="color: #FF500D">Utveckling</span>)
+                </span>
+                <img th:if="${basicModel.getSecondaryLogoUrl() != null}" style="float: right" th:src="${basicModel.getSecondaryLogoUrl()}" alt="Logo" height="50">
             </h2>
         </div>
         <div class="card-body">
-            <div style="float: right">
+            <div class="float-end">
                 <a th:href="'javascript:selectLang(\'en\',\'' + ${lang} + '\',\'result\')'"
-                   th:class="${lang.equalsIgnoreCase('en') ? 'lang-selected':''}">en</a>
+                   th:class="${lang.equalsIgnoreCase('en') ? 'lang-selected text-decoration-none':'text-decoration-none'}">en</a>
                 <a th:href="'javascript:selectLang(\'sv\',\'' + ${lang} + '\',\'result\')'"
-                   th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected':''}">sv</a>
+                   th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected text-decoration-none':'text-decoration-none'}">sv</a>
             </div>
             <h4 th:text="${text.getString('title1')}"></h4>
-            <span th:text="${text.getString('document')}"></span>&nbsp;<b th:text="${resultPageData.getDocumentName()}"></b>&nbsp;&nbsp;
+            <span th:text="${text.getString('document')}"></span>&nbsp;
+            <b th:text="${resultPageData.getDocumentName()}"></b>&nbsp;&nbsp;
             <button th:if="${resultPageData.getDocumentType() != null}"
                     class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
                     onclick="$('#sigDataDiv').fadeIn(700)"
@@ -54,24 +54,24 @@
                     <td class="overall-param" th:text="${text.getString('status')}"></td>
                     <th:block th:switch="${resultPageData.getStatus()}">
                         <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).ok}">
-                            <i class='fas fa-check-circle icon-ok'></i>&nbsp;<span th:text="${text.getString('docOk')}"></span>
+                            <i class="fas fa-check-circle text-success"></i>&nbsp;<span th:text="${text.getString('docOk')}"></span>
                         </td>
                         <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).unsigned}">
-                            <i class='fas fa-times-circle icon-error'></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
+                            <i class="fas fa-times-circle text-danger"></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
                         </td>
                         <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).novalidcoversdoc}">
-                            <i class='fas fa-times-circle icon-error'></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
+                            <i class="fas fa-times-circle text-danger"></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
                         </td>
                         <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).invalid}">
-                            <i class='fas fa-times-circle icon-error'></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
+                            <i class="fas fa-times-circle text-danger"></i>&nbsp;<span th:text="${text.getString(resultPageData.getStatus().name())}"></span>
                         </td>
                         <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.DocValidStatus).someinvalid}">
-                            <i class='fas fa-exclamation-triangle icon-warning'></i>&nbsp;<span th:text="${text.getString('someinvalid')}"></span>
+                            <i class="fas fa-exclamation-triangle text-warning"></i>&nbsp;<span th:text="${text.getString('someinvalid')}"></span>
                         </td>
                     </th:block>
-                    <td style="text-align: right">
+                    <td class="text-end">
                         <th:block th:switch="${showReportOptions}">
-                            <button th:case="true" type="button" class="btn btn-sm btn-outline-dark" data-toggle="modal" data-target="#reportOptionsModal"
+                            <button th:case="true" type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#reportOptionsModal"
                                     style="height: 25px; padding-top: 1px; padding-bottom: 1px;"
                                     th:text="${text.getString('validationReport')}"></button>
                             <button th:case="false" class="btn btn-sm btn-outline-dark" style="height: 25px; padding-top: 1px; padding-bottom: 1px;"
@@ -84,129 +84,113 @@
                     <td class="overall-param" th:text="${text.getString('doctype')}"></td>
                     <td th:text="${docType.name()}"></td>
                 </tr>
-                <!--
-                <tr>
-                    <td class="doc-valid-param"><%=resultText.get("sigcount")%>
-                    </td>
-                    <td class="doc-valid-param"><%=data.getNumberOfSignatures()%>
-                    </td>
-                </tr>
-                <tr>
-                    <td><%=resultText.get("validcount")%>
-                    </td>
-                    <td><%=data.getValidSignatures()%>
-                    </td>
-                </tr>
-                -->
             </table>
             <button th:if="${resultPageData.getStatus().name().equalsIgnoreCase('ok') && svtAvailable}"
                     class="btn btn-sm btn-outline-dark" style="height: 25px; padding-top: 1px; padding-bottom: 1px; margin-bottom: 10px"
                     th:onclick="'downloadSvt(' + ${newSvtTab} + ')'"
                     th:text="${text.getString('getSvt')}"></button>&nbsp;&nbsp;&nbsp;
 
-            <!-- Display each signature -->
+            <!-- Result Signatures -->
             <th:block th:each="sigData, sigDataStat : ${resultPageData.getResultSignatureDataList()}">
-                <div class="card">
-                    <div class="card-header bg-secondary text-white"><h5 th:text="${text.getString('signature')} + ' ' + ${sigDataStat.count}"></h5></div>
-                </div>
-                <div class="card-body">
-                    <table class="table table-sm">
-                        <tr>
-                            <td class="sig-res-param" th:text="${text.getString('status')}"><%=resultText.get("status")%>
-                            </td>
-                            <th:block th:switch="${sigData.getStatus()}">
-                                <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok}">
-                                    <i class='fas fa-check-circle icon-ok'></i>&nbsp;<span th:text="${text.getString('sigOK')}"></span>
+                <div class="card border-0">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 th:text="${text.getString('signature')} + ' ' + ${sigDataStat.count}"></h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <tr>
+                                <td class="sig-res-param" th:text="${text.getString('status')}"></td>
+                                <th:block th:switch="${sigData.getStatus()}">
+                                    <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok}">
+                                        <i class="fas fa-check-circle text-success"></i>&nbsp;<span th:text="${text.getString('sigOK')}"></span>
+                                    </td>
+                                    <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).sigerror}">
+                                        <i class="fas fa-times-circle text-danger"></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
+                                    </td>
+                                    <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).invalidCert}">
+                                        <i class="fas fa-times-circle text-danger"></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
+                                    </td>
+                                    <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).incomplete}">
+                                        <i class="fas fa-times-circle text-danger"></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
+                                    </td>
+                                </th:block>
+                            </tr>
+                            <tr th:if="${!sigData.getStatus().equals(T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok) && sigData.getErrorMessage() != null}">
+                                <td class="sig-res-param" th:text="${text.getString('reason')}"></td>
+                                <td th:text="${sigData.getErrorMessage()}"></td>
+                            </tr>
+                            <tr>
+                                <td class="sig-res-param" th:text="${text.getString('validationType')}"></td>
+                                <td th:text="${sigData.isSvt() ? text.getString('svt') : text.getString('signatureValidation')}"></td>
+                            </tr>
+                            <tr th:if="${sigData.getValidationDateLimit() != null || sigData.isSvt()}">
+                                <td class="sig-res-param" th:text="${text.getString('validationDateLimit')}"></td>
+                                <td th:text="${sigData.getValidationDateLimit() != null ? sigData.getValidationDateLimit() : text.getString('unlimited')}"></td>
+                            </tr>
+                            <tr th:if="${sigData.getStatus().equals(T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok)}">
+                                <td class="sig-res-param" th:text="${text.getString('coversDoc')}"></td>
+                                <td>
+                                    <span th:text="${sigData.isCoversAllData() ? text.getString('coverAll') : text.getString('coverSome')}"></span>
+                                    &nbsp;
+                                    <button th:if="${enableSignedDataView && sigData.isSignedDataAvailable() && !sigData.isCoversAllData()}"
+                                            class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
+                                            th:onclick="'$(\'#sigDataDiv-' + ${sigDataStat.count} + '\').fadeIn(700);'"
+                                            th:text="${text.getString('showSignedContent')}"></button>
                                 </td>
-                                <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).sigerror}">
-                                    <i class='fas fa-times-circle icon-error'></i></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
-                                </td>
-                                <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).invalidCert}">
-                                    <i class='fas fa-times-circle icon-error'></i></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
-                                </td>
-                                <td th:case="${T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).incomplete}">
-                                    <i class='fas fa-times-circle icon-error'></i></i>&nbsp;<span th:text="${text.getString(sigData.getStatus().name())}"></span>
-                                </td>
+                            </tr>
+                            <th:block th:if="${sigData.getIdp() != null}">
+                                <tr>
+                                    <td class="sig-res-param" th:text="${text.getString('signtime')}"></td>
+                                    <td th:text="${sigData.getSigningTime()}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="sig-res-param" th:text="${text.getString('idp')}"></td>
+                                    <td th:text="${sigData.getIdp()}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="sig-res-param" th:text="${text.getString('sp')}"></td>
+                                    <td th:text="${sigData.getServiceProvider()}"></td>
+                                </tr>
+                                <tr th:if="${showLoa && sigData.getLoa() != null}">
+                                    <td class="sig-res-param" th:text="${text.getString('loa')}"></td>
+                                    <td th:text="${sigData.getLoa()}"></td>
+                                </tr>
                             </th:block>
-                        </tr>
-                        <tr th:if="${!sigData.getStatus().equals(T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok) && sigData.getErrorMessage() != null}" >
-                            <td class="sig-res-param" th:text="${text.getString('reason')}"></td>
-                            <td th:text="${sigData.getErrorMessage()}"></td>
-                        </tr>
-                        <tr>
-                            <td class="sig-res-param" th:text="${text.getString('validationType')}"></td>
-                            <td th:text="${sigData.isSvt() ? text.getString('svt') : text.getString('signatureValidation')}"></td>
-                        </tr>
-                        <tr th:if="${sigData.getValidationDateLimit() != null || sigData.isSvt()}">
-                            <td class="sig-res-param" th:text="${text.getString('validationDateLimit')}"></td>
-                            <td th:text="${sigData.getValidationDateLimit() != null ? sigData.getValidationDateLimit() : text.getString('unlimited')}"></td>
-                        </tr>
-                        <tr th:if="${sigData.getStatus().equals(T(se.idsec.sigval.sigvalservice.result.data.SigValidStatus).ok)}">
-                            <td class="sig-res-param" th:text="${text.getString('coversDoc')}"></td>
-                            <td>
-                                <span th:text="${sigData.isCoversAllData() ? text.getString('coverAll') : text.getString('coverSome')}"></span>
-                                &nbsp;
-                                <button th:if="${enableSignedDataView && sigData.isSignedDataAvailable() && !sigData.isCoversAllData()}"
-                                        class="btn btn-sm btn-primary" style="height: 25px; padding-top: 1px; padding-bottom: 1px"
-                                        th:onclick="'$(\'#sigDataDiv-' + ${sigDataStat.count} +'\').fadeIn(700);'"
-                                        th:text="${text.getString('showSignedContent')}"></button>
-                            </td>
-                        </tr>
-                        <th:block th:if="${sigData.getIdp() != null}">
-                            <tr>
-                                <td class="sig-res-param" th:text="${text.getString('signtime')}"></td>
-                                <td th:text="${sigData.getSigningTime()}"></td>
+                            <tr th:if="${sigData.getTimeStampTime() != null}">
+                                <td class="sig-res-param" th:text="${text.getString('timestamp')}"></td>
+                                <td>
+                                    <span th:text="${sigData.getTimeStampTime()}"></span>
+                                    <span th:if="${sigData.getTimeStampType() != null}" th:text="' (' + ${text.getString(sigData.getTimeStampType())} + ')'"></span>
+                                </td>
                             </tr>
-                            <tr>
-                                <td class="sig-res-param" th:text="${text.getString('idp')}"></td>
-                                <td th:text="${sigData.getIdp()}"></td>
-                            </tr>
-                            <tr>
-                                <td class="sig-res-param" th:text="${text.getString('sp')}"></td>
-                                <td th:text="${sigData.getServiceProvider()}"></td>
-                            </tr>
-                            <tr th:if="${showLoa && sigData.getLoa() != null}">
-                                <td class="sig-res-param" th:text="${text.getString('loa')}"></td>
-                                <td th:text="${sigData.getLoa()}"></td>
-                            </tr>
-                        </th:block>
-                        <tr th:if="${sigData.getTimeStampTime() != null}">
-                            <td class="sig-res-param" th:text="${text.getString('timestamp')}"></td>
-                            <td>
-                                <span th:text="${sigData.getTimeStampTime()}"></span>
-                                <span th:if="${sigData.getTimeStampType() != null}" th:text="' (' + ${text.getString(sigData.getTimeStampType())} + ')'"></span>
-                            </td>
-                        </tr>
-
-                    </table>
-                    <h6 th:if="${sigData.getSignerAttribute().size() > 0}" class="text-dark"><b th:text="${text.getString('signer')}"></b></h6>
-                    <table class="table table-sm table-striped">
-                        <th:block th:each="attr, attrStat : ${sigData.getSignerAttribute()}">
-                            <tr>
-                                <td class="attr-td" th:text="${attr.getName()}"></td>
-                                <td th:text="${attr.getValue()}"></td>
-                            </tr>
-                        </th:block>
-                    </table>
+                        </table>
+                        </table>
+                        <h6 th:if="${sigData.getSignerAttribute().size() > 0}" class="text-dark"><b th:text="${text.getString('signer')}"></b></h6>
+                        <table class="table table-sm table-striped">
+                            <th:block th:each="attr, attrStat : ${sigData.getSignerAttribute()}">
+                                <tr>
+                                    <td class="attr-td" th:text="${attr.getName()}"></td>
+                                    <td th:text="${attr.getValue()}"></td>
+                                </tr>
+                            </th:block>
+                        </table>
+                    </div>
                 </div>
             </th:block>
 
-            <br>
-            <a class="btn btn-primary" href="home" th:text="${text.getString('home')}"></a>
+            <a class="btn btn-primary mt-1" href="home" th:text="${text.getString('home')}"></a>
 
         </div>
     </div>
 </div>
 
 <!-- Report options modal  -->
-<div class="modal" id="reportOptionsModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="reportOptionsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" th:text="${text.getString('valReportOptions')}"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="form-check">
@@ -219,69 +203,44 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close"  onclick="getValidationReport()" th:text="${text.getString('getReport')}">Get report</button>
+                <button class="btn btn-sm btn-primary" data-bs-dismiss="modal"
+                        onclick="getValidationReport()"
+                        th:text="${text.getString('getReport')}"></button>
             </div>
         </div>
     </div>
 </div>
-
 
 <!-- Signed document display box -->
 <div id="sigDataDiv" class="confirm-bgr">
     <div class="card metadata-panel">
         <div class="card-header">
-            <table style="width: 100%">
-                <tr>
-                    <td>
-                        <h5 th:text="${resultPageData.getDocumentName()}"></h5>
-                    </td>
-                    <td style="text-align: right">
-                        <button class="btn btn-sm btn-primary" style="margin-top: 10px" onclick="$('#sigDataDiv').fadeOut(700);" th:text="${text.getString('close')}"></button>
-                    </td>
-                </tr>
-            </table>
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 th:text="${resultPageData.getDocumentName()}"></h5>
+                <button class="btn btn-sm btn-primary mt-2"
+                        onclick="$('#sigDataDiv').fadeOut(700);"
+                        th:text="${text.getString('close')}"></button>
+            </div>
         </div>
         <div class="card-body">
             <div id="sigDataDisplayDiv">
                 <th:block th:switch="${docType}">
-                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).XML}" style="white-space: pre-wrap;"><code th:text="${xmlPrettyPrint}"></code></pre>
-                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).JOSE}" style="white-space: pre-wrap;"><code th:text="${josePrettyPrint}"></code></pre>
-                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).JOSE_COMPACT}" style="white-space: pre-wrap;"><code th:text="${joseCompact}"></code></pre>
-                    <embed th:case="${T(se.swedenconnect.sigval.commons.document.DocType).PDF}" id='pdfFrame' src='inlinepdf' type='application/pdf' style='width: 100%'>
+                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).XML}" class="white-space-pre-wrap">
+                        <code th:text="${xmlPrettyPrint}"></code>
+                    </pre>
+                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).JOSE}" class="white-space-pre-wrap">
+                        <code th:text="${josePrettyPrint}"></code>
+                    </pre>
+                    <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).JOSE_COMPACT}" class="white-space-pre-wrap">
+                        <code th:text="${joseCompact}"></code>
+                    </pre>
+                    <embed th:case="${T(se.swedenconnect.sigval.commons.document.DocType).PDF}"
+                           class="w-100" id="pdfFrame" src="inlinepdf"
+                           type="application/pdf"></embed>
                 </th:block>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Signed content display box -->
-<th:block th:each="sigData, sigDataStat: ${signedDocs}">
-    <!-- Signed document display box -->
-    <div th:id="'sigDataDiv-'+${sigDataStat.count}" class="confirm-bgr">
-        <div class="card metadata-panel">
-            <div class="card-header">
-                <table style="width: 100%">
-                    <tr>
-                        <td>
-                            <h5 th:text="${text.getString('contentSignedBySignature')} + ' ' + ${sigDataStat.count}"></h5>
-                        </td>
-                        <td style="text-align: right">
-                            <button class="btn btn-sm btn-primary" style="margin-top: 10px" th:onclick="'$(\'#sigDataDiv-' + ${sigDataStat.count} +'\').fadeOut(700);'" th:text="${text.getString('close')}"></button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div class="card-body">
-                <div th:id="'sigDataDisplayDiv-'+${sigDataStat.count}">
-                    <th:block th:switch="${docType}">
-                        <pre th:case="${T(se.swedenconnect.sigval.commons.document.DocType).XML}"><code th:text="${sigData}"></code></pre>
-                        <embed th:case="${T(se.swedenconnect.sigval.commons.document.DocType).PDF}" th:id="'pdfFrame-'+${sigDataStat.count}" th:src="${sigData}" type="application/pdf" style="width: 100%">
-                    </th:block>
-                </div>
-            </div>
-        </div>
-    </div>
-</th:block>
-
 </body>
 </html>
