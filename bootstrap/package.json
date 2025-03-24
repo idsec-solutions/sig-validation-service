@@ -1,0 +1,17 @@
+{
+  "name": "bootstrap-custom",
+  "version": "1.0.0",
+  "description": "Custom Bootstrap build with Parcel",
+  "scripts": {
+    "dev": "parcel src/test.html",
+    "build": "parcel build src/scss/bootstrap-swedenconnect.scss src/scss/bootstrap-edusign.scss src/scss/bootstrap-sunet.scss --dist-dir dist/css --no-source-maps --no-content-hash"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.14.1",
+    "parcel": "^2.14.1"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "parcel": "^2.14.1"
+  }
+}

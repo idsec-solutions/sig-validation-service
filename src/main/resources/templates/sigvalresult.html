@@ -14,8 +14,7 @@
     <script src="js/result.js"></script>
     <script src="js/lang.js"></script>
 
-<!--    <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>-->
-    <link rel="stylesheet" href="webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="${basicModel.getBootstrapCss()}"/>
     <link rel="stylesheet" href="webjars/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="webjars/highlightjs/11.5.0/styles/atom-one-light.min.css"/>
     <link rel="stylesheet" href="css/main.css"/>
@@ -38,9 +37,9 @@
         <div class="card-body">
             <div class="float-end">
                 <a th:href="'javascript:selectLang(\'en\',\'' + ${lang} + '\',\'result\')'"
-                   th:class="${lang.equalsIgnoreCase('en') ? 'lang-selected':''}">en</a>
+                   th:class="${lang.equalsIgnoreCase('en') ? 'lang-selected text-decoration-none':'text-decoration-none'}">en</a>
                 <a th:href="'javascript:selectLang(\'sv\',\'' + ${lang} + '\',\'result\')'"
-                   th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected':''}">sv</a>
+                   th:class="${lang.equalsIgnoreCase('sv') ? 'lang-selected text-decoration-none':'text-decoration-none'}">sv</a>
             </div>
             <h4 th:text="${text.getString('title1')}"></h4>
             <span th:text="${text.getString('document')}"></span>&nbsp;
@@ -93,7 +92,7 @@
 
             <!-- Result Signatures -->
             <th:block th:each="sigData, sigDataStat : ${resultPageData.getResultSignatureDataList()}">
-                <div class="card">
+                <div class="card border-0">
                     <div class="card-header bg-secondary text-white">
                         <h5 th:text="${text.getString('signature')} + ' ' + ${sigDataStat.count}"></h5>
                     </div>
@@ -165,11 +164,21 @@
                                 </td>
                             </tr>
                         </table>
+                        </table>
+                        <h6 th:if="${sigData.getSignerAttribute().size() > 0}" class="text-dark"><b th:text="${text.getString('signer')}"></b></h6>
+                        <table class="table table-sm table-striped">
+                            <th:block th:each="attr, attrStat : ${sigData.getSignerAttribute()}">
+                                <tr>
+                                    <td class="attr-td" th:text="${attr.getName()}"></td>
+                                    <td th:text="${attr.getValue()}"></td>
+                                </tr>
+                            </th:block>
+                        </table>
                     </div>
                 </div>
             </th:block>
 
-            <a class="btn btn-primary" href="home" th:text="${text.getString('home')}"></a>
+            <a class="btn btn-primary mt-1" href="home" th:text="${text.getString('home')}"></a>
 
         </div>
     </div>

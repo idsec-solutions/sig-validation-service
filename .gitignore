@@ -32,3 +32,9 @@ build/
 
 ### Mac ###
 .DS_Store
+
+### NPM ###
+.parcel-cache
+node_modules
+dist
+bootstrap/node/*
