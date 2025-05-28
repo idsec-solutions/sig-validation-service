@@ -422,6 +422,20 @@
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                                <configuration>
+                                    <source>${java.version}</source>
+                                    <doclint>none</doclint>
+                                    <sourceFileExcludes>
+                                        <sourceFileExclude>**/generated-sources/**/*.java</sourceFileExclude>
+                                    </sourceFileExcludes>
+                                    <additionalJOptions>
+                                        <additionalJOption>--add-modules</additionalJOption>
+                                        <additionalJOption>java.base</additionalJOption>
+                                        <additionalJOption>--add-exports</additionalJOption>
+                                        <additionalJOption>java.base/sun.security.x509=ALL-UNNAMED</additionalJOption>
+                                    </additionalJOptions>
+                                    <failOnError>false</failOnError>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
