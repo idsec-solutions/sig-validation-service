@@ -2,23 +2,25 @@
 
 **Latest Current version: 1.2.9**
 
-| Version | Comment                                                                                                   | Date       |
-|---------|-----------------------------------------------------------------------------------------------------------|------------|
-| 1.0.0   | Initial release                                                                                           | 2020-10-01 |
-| 1.0.1   | Support for signature validation date limit                                                               | 2020-10-02 |
-| 1.0.2   | Fixed file size issue                                                                                     | 2020-10-06 |
-| 1.0.3   | Fixed chain_hash bug in svt lib                                                                           | 2020-10-23 |
-| 1.0.4   | Updated PDF context checking to allow legitimate changes to PDF documents afters signing                  | 2021-02-02 |
-| 1.1.0   | Support for JSON validation, ETSI 110 102-2 validation report and REST API for validation and SVT issuing | 2022-05-04 |
-| 1.2.0   | Move to use of Credential Support from Sweden Connect.                                                    | 2023-01-30 |
-| 1.2.1   | Updating signature validation base lib to 1.2.3                                                           | 2023-09-13 |
-| 1.2.3   | Updating signature validation base lib to 1.2.4                                                           | 2023-10-25 |
-| 1.2.4   | Fix HSM certificate loading                                                                               | 2023-11-21 |
-| 1.2.5   | Fix XML parsing bug of time not expressed in CET                                                          | 2023-11-22 |
-| 1.2.6   | Configuration options for inline or attached SVT in web UI                                                | 2023-09-13 |
-| 1.2.7   | UI updates                                                                                                | 2023-12-11 |
-| 1.2.8   | Corrected display of validation result with SVT                                                           | 2024-02-09 |
-| 1.2.9   | Corrected display of authentication LoA level                                                             | 2024-04-16 |
+| Version | Comment                                                                                                                        | Date       |
+|---------|--------------------------------------------------------------------------------------------------------------------------------|------------|
+| 1.0.0   | Initial release                                                                                                                | 2020-10-01 |
+| 1.0.1   | Support for signature validation date limit                                                                                    | 2020-10-02 |
+| 1.0.2   | Fixed file size issue                                                                                                          | 2020-10-06 |
+| 1.0.3   | Fixed chain_hash bug in svt lib                                                                                                | 2020-10-23 |
+| 1.0.4   | Updated PDF context checking to allow legitimate changes to PDF documents afters signing                                       | 2021-02-02 |
+| 1.1.0   | Support for JSON validation, ETSI 110 102-2 validation report and REST API for validation and SVT issuing                      | 2022-05-04 |
+| 1.2.0   | Move to use of Credential Support from Sweden Connect.                                                                         | 2023-01-30 |
+| 1.2.1   | Updating signature validation base lib to 1.2.3                                                                                | 2023-09-13 |
+| 1.2.3   | Updating signature validation base lib to 1.2.4                                                                                | 2023-10-25 |
+| 1.2.4   | Fix HSM certificate loading                                                                                                    | 2023-11-21 |
+| 1.2.5   | Fix XML parsing bug of time not expressed in CET                                                                               | 2023-11-22 |
+| 1.2.6   | Configuration options for inline or attached SVT in web UI                                                                     | 2023-09-13 |
+| 1.2.7   | UI updates                                                                                                                     | 2023-12-11 |
+| 1.2.8   | Corrected display of validation result with SVT                                                                                | 2024-02-09 |
+| 1.2.9   | Corrected display of authentication LoA level                                                                                  | 2024-04-16 |
+| 1.3.1   | Java 21, Spring boot 3.4.3, Extended PDF document update validation, Bootstrap 5, Bootstrap css builder, Indeterminate display | 2025-03-28 |
+| 1.3.2   | Spring Boot 3.4.4, credential support 2.0.5, publication to maven central                                                      | 2025-05-28 |
 
 
 ## version 1.2.8

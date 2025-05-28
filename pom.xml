@@ -12,7 +12,7 @@
     <artifactId>sigval-service</artifactId>
     <version>1.3.2</version>
     <name>sigval-service</name>
-    <description>Demo project for Spring Boot</description>
+    <description>Signature validation service with Bootstrap CSS profiles for Sweden Connect and EduSign</description>
 
     <properties>
         <java.version>21</java.version>
