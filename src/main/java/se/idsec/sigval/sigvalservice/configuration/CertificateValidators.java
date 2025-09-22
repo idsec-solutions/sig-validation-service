@@ -82,6 +82,7 @@ public class CertificateValidators {
 
     if (tslTrustRoot != null) {
       try {
+        log.info("Loading trusted certificates from TSL source: {}", tslTrustRoot);
         TslTrustCertStoreFactory ttCSFactory = new TslTrustCertStoreFactory(tslTrustRoot, webClient);
         policyRoot = ttCSFactory.getPolicyRoot();
         certStore = ttCSFactory.getCertStore();
