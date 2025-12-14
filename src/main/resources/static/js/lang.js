@@ -17,15 +17,25 @@
 var langCookieName = "langSelect"
 
 function selectLang(lang, currentLang, destination){
+
+    if (lang !== "sv" && lang !== "en") {
+        return;
+    }
+
     Cookies.set(langCookieName, lang, {expires : 100})
+
     if (lang === currentLang){
         return;
     }
 
-    // Dirty input validation fix, assumes only languages are sv and en
-    if (lang !== "sv" && lang !== "en"){
-	return;
+    var dest;
+    switch (destination) {
+        case "home": dest = "home"
+            break;
+        case "result": dest = "result"
+            break;
+        default: dest = "home"
     }
 
-    window.location=destination;
+    window.location.assign(dest);
 }
