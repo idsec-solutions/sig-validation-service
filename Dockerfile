@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-buster
+FROM eclipse-temurin:21-jdk-noble
 
 
 ADD target/sigval-service-*.jar /app.jar
