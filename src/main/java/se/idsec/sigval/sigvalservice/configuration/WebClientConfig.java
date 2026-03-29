@@ -42,6 +42,12 @@ public class WebClientConfig {
   @Value("${sigval-service.http.connect-timeout-millis}") int connectTimeoutMillis;
   @Value("${sigval-service.http.read-timeout-millis}") int readTimeoutMillis;
 
+  @Bean
+  public WebClient.Builder webClientBuilder() {
+    return WebClient.builder()
+        .codecs(c -> c.defaultCodecs().maxInMemorySize(4 * 1024 * 1024));
+  }
+
   @Bean(name = "webClientBean")
   public WebClient webClient(WebClient.Builder webClientBuilder, final HttpProxyProperties httpProxyProperties)
       throws Exception {
