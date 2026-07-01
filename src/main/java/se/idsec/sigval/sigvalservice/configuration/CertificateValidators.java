@@ -55,6 +55,7 @@ public class CertificateValidators {
   @Value("${sigval-service.cert-validator.svt.tsltrust-root:#{null}}") String svtTslTrustRoot;
   @Value("${sigval-service.cert-validator.svt.trusted-folder:#{null}}") String svtTrustFolder;
   @Value("${sigval-service.cert-validator.svt.kid-match-folder:#{null}}") String kidMatchFolder;
+  @Value("${sigval-service.cert-validator.accept-no-rev-avail:true}") boolean acceptNoRevAvail;
 
   @Getter private CertificateValidator signatureCertificateValidator;
   @Getter private CertificateValidator timestampCertificateValidator;
@@ -91,7 +92,10 @@ public class CertificateValidators {
       }
     }
     X509Certificate[] additionalCertsArray = getAdditionalTrustedCerts(policyRoot, trustFolder);
-    return new StatusCheckingCertificateValidatorImpl(crlCache, certStore, additionalCertsArray);
+    final StatusCheckingCertificateValidatorImpl statusCheckingCertificateValidator =
+        new StatusCheckingCertificateValidatorImpl(crlCache, certStore, additionalCertsArray);
+    statusCheckingCertificateValidator.setAcceptNoRevAvail(acceptNoRevAvail);
+    return statusCheckingCertificateValidator;
   }
 
   private X509Certificate[] getAdditionalTrustedCerts(X509Certificate policyRoot, String trustFolderName) {

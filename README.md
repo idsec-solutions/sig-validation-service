@@ -44,6 +44,16 @@ The signature validation service implements a number of independent trust strate
 - Using DIGG trust configuration service
 - Specifying a local set of trusted certificate issuers, time-stamp issuers, and SVT issuers.
 
+### Certificate revocation checking
+
+A certificate may declare that no revocation information is available for it by including the `noRevAvail` extension (`id-ce-noRevAvail`, RFC 9608). When a certificate carries this extension, the certificate path validator accepts it without performing CRL or OCSP revocation checking. All other certificates in the path are still revocation checked as usual.
+
+This behaviour is controlled by the following property, which applies to the signature, time-stamp, and SVT certificate validators:
+
+| Property | Description |
+|----------|-------------|
+| `sigval-service.cert-validator.accept-no-rev-avail` | `true` (default) accepts a certificate carrying the `noRevAvail` extension without revocation checking. Set to `false` to require positive revocation status (CRL or OCSP) for every certificate; a certificate that relies on `noRevAvail` then fails validation. |
+
 ## Supported signature formats
 
 This application supports validation of the following signature formats:
