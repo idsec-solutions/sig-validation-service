@@ -5,18 +5,18 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.4</version>
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
     <groupId>se.idsec.sigval</groupId>
     <artifactId>sigval-service</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <name>sigval-service</name>
     <description>Signature validation service with Bootstrap CSS profiles for Sweden Connect and EduSign</description>
 
     <properties>
         <java.version>21</java.version>
-        <signature-validation.version>2.0.1</signature-validation.version>
+        <signature-validation.version>3.0.0</signature-validation.version>
     </properties>
 
     <scm>
@@ -59,22 +59,22 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.83</version>
+                <version>1.84</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>1.83</version>
+                <version>1.84</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcutil-jdk18on</artifactId>
-                <version>1.83</version>
+                <version>1.84</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.44</version>
+                <version>1.18.46</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -95,7 +95,7 @@
             <dependency>
                 <groupId>com.nimbusds</groupId>
                 <artifactId>nimbus-jose-jwt</artifactId>
-                <version>10.8</version>
+                <version>10.9.1</version>
             </dependency>
 
             <!-- Convergence error corrections -->
@@ -133,7 +133,7 @@
             <dependency>
                 <groupId>se.swedenconnect.security</groupId>
                 <artifactId>credentials-support</artifactId>
-                <version>2.2.0</version>
+                <version>2.2.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
