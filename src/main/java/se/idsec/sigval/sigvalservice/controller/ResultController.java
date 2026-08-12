@@ -99,7 +99,7 @@ public class ResultController {
           signedDocumentList.add("No document available");
         }
       } else {
-        signedDocumentList.add("inlinepdf?id="+i);
+        signedDocumentList.add("inlineDocument?id="+i);
       }
     }
 

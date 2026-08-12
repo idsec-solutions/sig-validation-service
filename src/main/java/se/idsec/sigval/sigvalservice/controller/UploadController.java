@@ -77,8 +77,8 @@ public class UploadController {
    * @return the bytes of the referenced document
    * @throws IOException on failure to obtain the requested document
    */
-  @RequestMapping(value = "/inlinepdf", method = RequestMethod.GET, produces = "application/pdf")
-  public byte[] getInlinePdfDocument(
+  @RequestMapping(value = "/inlineDocument", method = RequestMethod.GET, produces = "application/pdf")
+  public byte[] getInlineDocument(
     @RequestParam(value = "id", required = false) String id) throws IOException{
     byte[] docBytes = null;
     if (id == null) {
@@ -94,7 +94,13 @@ public class UploadController {
     }
     String docMimeType = (String) httpSession.getAttribute(SessionAttr.docMimeType.name());
 
-    if (docBytes == null || !docMimeType.equalsIgnoreCase("application/pdf")) {
+    if (docBytes == null) {
+      throw new IOException("Target document is not available");
+    }
+    // The whole-document inline view (no id) is only served for PDF uploads. Per-signature signed revisions (id set)
+    // are served regardless of document type; the AJAX caller renders them appropriately (PDF as an embed, other
+    // types as text).
+    if (id == null && !docMimeType.equalsIgnoreCase("application/pdf")) {
       throw new IOException("Target PDF file is not available");
     }
     return docBytes;
