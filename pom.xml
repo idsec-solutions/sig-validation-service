@@ -10,13 +10,13 @@
     </parent>
     <groupId>se.idsec.sigval</groupId>
     <artifactId>sigval-service</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
     <name>sigval-service</name>
     <description>Signature validation service with Bootstrap CSS profiles for Sweden Connect and EduSign</description>
 
     <properties>
         <java.version>21</java.version>
-        <signature-validation.version>3.1.0</signature-validation.version>
+        <signature-validation.version>3.1.1</signature-validation.version>
     </properties>
 
     <scm>
